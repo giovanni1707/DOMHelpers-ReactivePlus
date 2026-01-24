@@ -77,42 +77,34 @@ dispose();
 Let's say you're building a user profile that shows various pieces of user data:
 
 ```javascript
-// ❌ Without bindings - lots of manual effects
-const user = state({
+// ❌ Vanilla JavaScript - lots of manual updates
+const user = {
   name: 'Alice',
   email: 'alice@example.com',
   status: 'online',
   avatar: '👩',
   role: 'Admin',
   lastSeen: '2 minutes ago'
-});
+};
 
-// Manual effect for each element
-effect(() => {
-  Elements.userName.textContent = user.name;
-});
+// Manual update function for each property
+function updateUserDisplay() {
+  document.getElementById('user-name').textContent = user.name;
+  document.getElementById('user-email').textContent = user.email;
+  document.getElementById('user-status').textContent = user.status;
+  document.getElementById('user-avatar').textContent = user.avatar;
+  document.getElementById('user-role').textContent = user.role;
+  document.getElementById('user-last-seen').textContent = user.lastSeen;
+}
 
-effect(() => {
-  Elements.userEmail.textContent = user.email;
-});
+// Must call this every time user data changes
+user.name = 'Bob';
+updateUserDisplay(); // Easy to forget!
 
-effect(() => {
-  Elements.userStatus.textContent = user.status;
-});
+user.status = 'away';
+updateUserDisplay(); // Must remember again!
 
-effect(() => {
-  Elements.userAvatar.textContent = user.avatar;
-});
-
-effect(() => {
-  Elements.userRole.textContent = user.role;
-});
-
-effect(() => {
-  Elements.userLastSeen.textContent = user.lastSeen;
-});
-
-// Lots of boilerplate! And we didn't even add styling or attributes yet...
+// Lots of boilerplate and error-prone!
 ```
 
 **What's the Real Issue?**
@@ -141,7 +133,7 @@ Lots of repetitive code
 ### The Solution with `bindings()`
 
 ```javascript
-// ✅ With bindings - clean and declarative
+// ✅ DOM Helpers + Reactive State with bindings() - clean and declarative
 const user = state({
   name: 'Alice',
   email: 'alice@example.com',
@@ -162,6 +154,7 @@ bindings({
 });
 
 // That's it! All elements auto-update when state changes
+user.name = 'Bob'; // ✨ DOM updates automatically, no manual calls needed!
 ```
 
 **What Just Happened?**

@@ -58,26 +58,27 @@ const user = state({
 Let's say you want to build a simple counter that updates the DOM:
 
 ```javascript
-// ❌ The manual way (without reactivity)
+// ❌ The manual way (vanilla JavaScript without reactivity)
 let count = 0;
 
 function updateCounter() {
-  Elements.counterDisplay.textContent = count;
-  Elements.counterBadge.textContent = count;
+  document.getElementById('counter-display').textContent = count;
+  document.getElementById('counter-badge').textContent = count;
 
+  const resetBtn = document.getElementById('reset-button');
   if (count > 0) {
-    Elements.resetButton.style.display = 'block';
+    resetBtn.style.display = 'block';
   } else {
-    Elements.resetButton.style.display = 'none';
+    resetBtn.style.display = 'none';
   }
 }
 
-Elements.incrementBtn.addEventListener('click', () => {
+document.getElementById('increment-btn').addEventListener('click', () => {
   count++;
   updateCounter(); // Must remember to call this!
 });
 
-Elements.decrementBtn.addEventListener('click', () => {
+document.getElementById('decrement-btn').addEventListener('click', () => {
   count--;
   updateCounter(); // And this!
 });
@@ -110,26 +111,32 @@ DOM updates
 ### The Solution with `state()`
 
 ```javascript
-// ✅ The reactive way
+// ✅ The reactive way (DOM Helpers + Reactive State)
 const counter = state({ count: 0 });
 
-// Set up automatic reactions once
+// Set up automatic reactions once - using bulk updates
 effect(() => {
-  Elements.counterDisplay.textContent = counter.count;
-  Elements.counterBadge.textContent = counter.count;
-});
-
-effect(() => {
-  Elements.resetButton.style.display = counter.count > 0 ? 'block' : 'none';
+  Elements.update({
+    counterDisplay: { textContent: counter.count },
+    counterBadge: { textContent: counter.count },
+    resetButton: {
+      style: { display: counter.count > 0 ? 'block' : 'none' }
+    }
+  });
 });
 
 // Just update the state - everything else happens automatically
-Elements.incrementBtn.addEventListener('click', () => {
-  counter.count++; // ✨ DOM updates automatically!
-});
-
-Elements.decrementBtn.addEventListener('click', () => {
-  counter.count--; // ✨ DOM updates automatically!
+Elements.update({
+  incrementBtn: {
+    addEventListener: ['click', () => {
+      counter.count++; // ✨ DOM updates automatically!
+    }]
+  },
+  decrementBtn: {
+    addEventListener: ['click', () => {
+      counter.count--; // ✨ DOM updates automatically!
+    }]
+  }
 });
 ```
 
@@ -416,11 +423,13 @@ const formData = state({
   agreed: false
 });
 
-// Sync state with DOM inputs
+// Sync state with DOM inputs using bulk updates
 effect(() => {
-  Elements.usernameInput.value = formData.username;
-  Elements.emailInput.value = formData.email;
-  Elements.agreeCheckbox.checked = formData.agreed;
+  Elements.update({
+    usernameInput: { value: formData.username },
+    emailInput: { value: formData.email },
+    agreeCheckbox: { checked: formData.agreed }
+  });
 });
 
 // Enable submit button when form is valid
@@ -429,20 +438,28 @@ effect(() => {
     && formData.email.includes('@')
     && formData.agreed;
 
-  Elements.submitBtn.disabled = !isValid;
+  Elements.update({
+    submitBtn: { disabled: !isValid }
+  });
 });
 
-// Update state from inputs
-Elements.usernameInput.addEventListener('input', (e) => {
-  formData.username = e.target.value; // ✨ Effects run automatically
-});
-
-Elements.emailInput.addEventListener('input', (e) => {
-  formData.email = e.target.value; // ✨ Effects run automatically
-});
-
-Elements.agreeCheckbox.addEventListener('change', (e) => {
-  formData.agreed = e.target.checked; // ✨ Effects run automatically
+// Update state from inputs using bulk event binding
+Elements.update({
+  usernameInput: {
+    addEventListener: ['input', (e) => {
+      formData.username = e.target.value; // ✨ Effects run automatically
+    }]
+  },
+  emailInput: {
+    addEventListener: ['input', (e) => {
+      formData.email = e.target.value; // ✨ Effects run automatically
+    }]
+  },
+  agreeCheckbox: {
+    addEventListener: ['change', (e) => {
+      formData.agreed = e.target.checked; // ✨ Effects run automatically
+    }]
+  }
 });
 ```
 
@@ -782,9 +799,13 @@ effect(() => {
   });
 });
 
-// Update state from DOM Helpers events
-Elements.incrementBtn.addEventListener('click', () => {
-  counter.count++;
+// Update state from DOM Helpers events using bulk event binding
+Elements.update({
+  incrementBtn: {
+    addEventListener: ['click', () => {
+      counter.count++;
+    }]
+  }
 });
 ```
 
@@ -806,13 +827,18 @@ const ui = state({
   darkMode: false
 });
 
-// Toggle with simple negation
-Elements.menuToggle.addEventListener('click', () => {
-  ui.menuOpen = !ui.menuOpen;
-});
-
-Elements.themeToggle.addEventListener('click', () => {
-  ui.darkMode = !ui.darkMode;
+// Toggle with simple negation using bulk event binding
+Elements.update({
+  menuToggle: {
+    addEventListener: ['click', () => {
+      ui.menuOpen = !ui.menuOpen;
+    }]
+  },
+  themeToggle: {
+    addEventListener: ['click', () => {
+      ui.darkMode = !ui.darkMode;
+    }]
+  }
 });
 ```
 
@@ -823,16 +849,23 @@ Elements.themeToggle.addEventListener('click', () => {
 ```javascript
 const counter = state({ count: 0 });
 
-Elements.increment.addEventListener('click', () => {
-  counter.count++;
-});
-
-Elements.decrement.addEventListener('click', () => {
-  counter.count--;
-});
-
-Elements.reset.addEventListener('click', () => {
-  counter.count = 0;
+// Using bulk event binding for cleaner code
+Elements.update({
+  increment: {
+    addEventListener: ['click', () => {
+      counter.count++;
+    }]
+  },
+  decrement: {
+    addEventListener: ['click', () => {
+      counter.count--;
+    }]
+  },
+  reset: {
+    addEventListener: ['click', () => {
+      counter.count = 0;
+    }]
+  }
 });
 ```
 
@@ -876,7 +909,12 @@ function reset() {
   Object.assign(app, initialState);
 }
 
-Elements.resetBtn.addEventListener('click', reset);
+// Wire up reset button using bulk event binding
+Elements.update({
+  resetBtn: {
+    addEventListener: ['click', reset]
+  }
+});
 ```
 
 ---

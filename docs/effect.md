@@ -63,7 +63,7 @@ dispose();
 Let's build a simple search feature that filters a list:
 
 ```javascript
-// ❌ The manual way (without effects)
+// ❌ The manual way (vanilla JavaScript without effects)
 const searchState = {
   query: '',
   results: []
@@ -71,23 +71,23 @@ const searchState = {
 
 function updateUI() {
   // Update search input
-  Elements.searchInput.value = searchState.query;
+  document.getElementById('search-input').value = searchState.query;
 
   // Update results display
-  Elements.resultsCount.textContent = searchState.results.length;
+  document.getElementById('results-count').textContent = searchState.results.length;
 
   // Update results list
-  Elements.resultsList.innerHTML = searchState.results
+  document.getElementById('results-list').innerHTML = searchState.results
     .map(item => `<li>${item}</li>`)
     .join('');
 
   // Show/hide empty message
-  Elements.emptyMessage.style.display =
-    searchState.results.length === 0 ? 'block' : 'none';
+  const emptyMsg = document.getElementById('empty-message');
+  emptyMsg.style.display = searchState.results.length === 0 ? 'block' : 'none';
 }
 
 // Handle search input
-Elements.searchInput.addEventListener('input', (e) => {
+document.getElementById('search-input').addEventListener('input', (e) => {
   searchState.query = e.target.value;
 
   // Filter results
@@ -126,40 +126,40 @@ Bugs and inconsistencies
 ### The Solution with `effect()`
 
 ```javascript
-// ✅ The reactive way
+// ✅ The reactive way (DOM Helpers + Reactive State)
 const search = state({
   query: '',
   results: []
 });
 
-// Declare WHAT should happen, not WHEN
+// Declare WHAT should happen, not WHEN - using bulk updates
 effect(() => {
-  Elements.searchInput.value = search.query;
+  Elements.update({
+    searchInput: { value: search.query },
+    resultsCount: { textContent: search.results.length },
+    resultsList: {
+      innerHTML: search.results
+        .map(item => `<li>${item}</li>`)
+        .join('')
+    },
+    emptyMessage: {
+      style: { display: search.results.length === 0 ? 'block' : 'none' }
+    }
+  });
 });
 
-effect(() => {
-  Elements.resultsCount.textContent = search.results.length;
-});
+// Handle search - just update the data using bulk event binding
+Elements.update({
+  searchInput: {
+    addEventListener: ['input', (e) => {
+      search.query = e.target.value;
 
-effect(() => {
-  Elements.resultsList.innerHTML = search.results
-    .map(item => `<li>${item}</li>`)
-    .join('');
-});
-
-effect(() => {
-  Elements.emptyMessage.style.display =
-    search.results.length === 0 ? 'block' : 'none';
-});
-
-// Handle search - just update the data
-Elements.searchInput.addEventListener('input', (e) => {
-  search.query = e.target.value;
-
-  search.results = allItems.filter(item =>
-    item.toLowerCase().includes(search.query.toLowerCase())
-  );
-  // ✨ All relevant effects run automatically!
+      search.results = allItems.filter(item =>
+        item.toLowerCase().includes(search.query.toLowerCase())
+      );
+      // ✨ All relevant effects run automatically!
+    }]
+  }
 });
 ```
 
@@ -566,37 +566,40 @@ Each effect only depends on the properties it actually reads. Changing `users` d
 ```javascript
 const counter = state({ count: 0 });
 
-// Auto-update display
+// Auto-update display using bulk updates
 effect(() => {
-  Elements.counterDisplay.textContent = counter.count;
-  Elements.counterBadge.textContent = counter.count;
+  Elements.update({
+    counterDisplay: { textContent: counter.count },
+    counterBadge: { textContent: counter.count },
+    decrementBtn: { disabled: counter.count <= 0 },
+    resetBtn: {
+      style: { display: counter.count === 0 ? 'none' : 'inline-block' }
+    }
+  });
 });
 
-// Auto-update button states
-effect(() => {
-  Elements.decrementBtn.disabled = counter.count <= 0;
-});
-
-effect(() => {
-  Elements.resetBtn.style.display = counter.count === 0 ? 'none' : 'inline-block';
-});
-
-// Event handlers just update state
-Elements.incrementBtn.addEventListener('click', () => {
-  counter.count++;
-  // ✨ All effects run automatically
-});
-
-Elements.decrementBtn.addEventListener('click', () => {
-  if (counter.count > 0) {
-    counter.count--;
-    // ✨ All effects run automatically
+// Event handlers just update state using bulk event binding
+Elements.update({
+  incrementBtn: {
+    addEventListener: ['click', () => {
+      counter.count++;
+      // ✨ All effects run automatically
+    }]
+  },
+  decrementBtn: {
+    addEventListener: ['click', () => {
+      if (counter.count > 0) {
+        counter.count--;
+        // ✨ All effects run automatically
+      }
+    }]
+  },
+  resetBtn: {
+    addEventListener: ['click', () => {
+      counter.count = 0;
+      // ✨ All effects run automatically
+    }]
   }
-});
-
-Elements.resetBtn.addEventListener('click', () => {
-  counter.count = 0;
-  // ✨ All effects run automatically
 });
 ```
 
@@ -611,52 +614,67 @@ const form = state({
   confirmPassword: ''
 });
 
-// Email validation effect
+// Email validation effect using bulk updates
 effect(() => {
   const isValid = form.email.includes('@') && form.email.includes('.');
 
-  Elements.emailError.update({
-    textContent: isValid ? '' : 'Invalid email format',
-    style: { display: isValid ? 'none' : 'block' }
+  Elements.update({
+    emailError: {
+      textContent: isValid ? '' : 'Invalid email format',
+      style: { display: isValid ? 'none' : 'block' }
+    },
+    emailInput: {
+      classList: {
+        toggle: ['error', !isValid && form.email.length > 0]
+      }
+    }
   });
-
-  Elements.emailInput.classList.toggle('error', !isValid && form.email.length > 0);
 });
 
-// Password match effect
+// Password match effect using bulk updates
 effect(() => {
   const matches = form.password === form.confirmPassword;
   const show = form.confirmPassword.length > 0;
 
-  Elements.passwordError.update({
-    textContent: matches ? '' : 'Passwords do not match',
-    style: { display: !matches && show ? 'block' : 'none' }
+  Elements.update({
+    passwordError: {
+      textContent: matches ? '' : 'Passwords do not match',
+      style: { display: !matches && show ? 'block' : 'none' }
+    }
   });
 });
 
-// Submit button state effect
+// Submit button state effect using bulk updates
 effect(() => {
   const emailValid = form.email.includes('@');
   const passwordValid = form.password.length >= 8;
   const passwordsMatch = form.password === form.confirmPassword;
 
-  Elements.submitBtn.disabled = !(emailValid && passwordValid && passwordsMatch);
+  Elements.update({
+    submitBtn: { disabled: !(emailValid && passwordValid && passwordsMatch) }
+  });
 });
 
-// Input handlers
-Elements.emailInput.addEventListener('input', (e) => {
-  form.email = e.target.value;
-  // ✨ Email validation effect runs
-});
-
-Elements.passwordInput.addEventListener('input', (e) => {
-  form.password = e.target.value;
-  // ✨ Password match + submit effects run
-});
-
-Elements.confirmPasswordInput.addEventListener('input', (e) => {
-  form.confirmPassword = e.target.value;
-  // ✨ Password match + submit effects run
+// Input handlers using bulk event binding
+Elements.update({
+  emailInput: {
+    addEventListener: ['input', (e) => {
+      form.email = e.target.value;
+      // ✨ Email validation effect runs
+    }]
+  },
+  passwordInput: {
+    addEventListener: ['input', (e) => {
+      form.password = e.target.value;
+      // ✨ Password match + submit effects run
+    }]
+  },
+  confirmPasswordInput: {
+    addEventListener: ['input', (e) => {
+      form.confirmPassword = e.target.value;
+      // ✨ Password match + submit effects run
+    }]
+  }
 });
 ```
 
@@ -831,9 +849,13 @@ effect(() => {
   document.body.classList.toggle('dark-mode', ui.darkMode);
 });
 
-// Usage
-Elements.themeToggle.addEventListener('click', () => {
-  ui.darkMode = !ui.darkMode;
+// Usage with bulk event binding
+Elements.update({
+  themeToggle: {
+    addEventListener: ['click', () => {
+      ui.darkMode = !ui.darkMode;
+    }]
+  }
 });
 ```
 
@@ -935,21 +957,22 @@ effect(() => {
 
 ## Comparing to Plain JavaScript
 
-### Before (Event-Driven Updates):
+### Before (Vanilla JavaScript - Event-Driven Updates):
 
 ```javascript
 const state = { count: 0 };
 
 function updateDisplay() {
-  Elements.display.textContent = state.count;
+  document.getElementById('display').textContent = state.count;
 }
 
 function updateBadge() {
-  Elements.badge.textContent = state.count;
+  document.getElementById('badge').textContent = state.count;
 }
 
 function updateButton() {
-  Elements.resetBtn.style.display = state.count > 0 ? 'block' : 'none';
+  const resetBtn = document.getElementById('reset-btn');
+  resetBtn.style.display = state.count > 0 ? 'block' : 'none';
 }
 
 function updateAll() {
@@ -958,7 +981,7 @@ function updateAll() {
   updateButton();
 }
 
-Elements.incrementBtn.addEventListener('click', () => {
+document.getElementById('increment-btn').addEventListener('click', () => {
   state.count++;
   updateAll(); // Manual call
 });
@@ -966,26 +989,30 @@ Elements.incrementBtn.addEventListener('click', () => {
 updateAll(); // Initial render
 ```
 
-### After (Effect-Driven Updates):
+### After (DOM Helpers + Reactive - Effect-Driven Updates):
 
 ```javascript
 const state = state({ count: 0 });
 
+// Single effect with bulk updates
 effect(() => {
-  Elements.display.textContent = state.count;
+  Elements.update({
+    display: { textContent: state.count },
+    badge: { textContent: state.count },
+    resetBtn: {
+      style: { display: state.count > 0 ? 'block' : 'none' }
+    }
+  });
 });
 
-effect(() => {
-  Elements.badge.textContent = state.count;
-});
-
-effect(() => {
-  Elements.resetBtn.style.display = state.count > 0 ? 'block' : 'none';
-});
-
-Elements.incrementBtn.addEventListener('click', () => {
-  state.count++;
-  // ✨ All effects run automatically
+// Bulk event binding
+Elements.update({
+  incrementBtn: {
+    addEventListener: ['click', () => {
+      state.count++;
+      // ✨ All effects run automatically
+    }]
+  }
 });
 ```
 
@@ -1008,7 +1035,7 @@ const todos = state({
   filter: 'all'
 });
 
-// Render todo list
+// Render todo list using bulk updates
 effect(() => {
   const filtered = todos.items.filter(item => {
     if (todos.filter === 'active') return !item.done;
@@ -1016,22 +1043,23 @@ effect(() => {
     return true;
   });
 
-  Elements.todoList.innerHTML = filtered
-    .map((item, index) => `
-      <li class="${item.done ? 'done' : ''}">
-        <input type="checkbox" ${item.done ? 'checked' : ''}
-               data-index="${index}">
-        <span>${item.text}</span>
-      </li>
-    `)
-    .join('');
-});
-
-// Update counts
-effect(() => {
-  Elements.totalCount.textContent = todos.items.length;
-  Elements.activeCount.textContent =
-    todos.items.filter(t => !t.done).length;
+  Elements.update({
+    todoList: {
+      innerHTML: filtered
+        .map((item, index) => `
+          <li class="${item.done ? 'done' : ''}">
+            <input type="checkbox" ${item.done ? 'checked' : ''}
+                   data-index="${index}">
+            <span>${item.text}</span>
+          </li>
+        `)
+        .join('')
+    },
+    totalCount: { textContent: todos.items.length },
+    activeCount: {
+      textContent: todos.items.filter(t => !t.done).length
+    }
+  });
 });
 
 // Update filter buttons
@@ -1043,21 +1071,25 @@ effect(() => {
   });
 });
 
-// Add todo
-Elements.addTodoForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  todos.items.push({
-    text: Elements.todoInput.value,
-    done: false
-  });
-  Elements.todoInput.value = '';
-});
-
-// Toggle todo
-Elements.todoList.addEventListener('change', (e) => {
-  if (e.target.type === 'checkbox') {
-    const index = parseInt(e.target.dataset.index);
-    todos.items[index].done = e.target.checked;
+// Add todo using bulk event binding
+Elements.update({
+  addTodoForm: {
+    addEventListener: ['submit', (e) => {
+      e.preventDefault();
+      todos.items.push({
+        text: Elements.todoInput.value,
+        done: false
+      });
+      Elements.todoInput.value = '';
+    }]
+  },
+  todoList: {
+    addEventListener: ['change', (e) => {
+      if (e.target.type === 'checkbox') {
+        const index = parseInt(e.target.dataset.index);
+        todos.items[index].done = e.target.checked;
+      }
+    }]
   }
 });
 ```
