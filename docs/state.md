@@ -58,26 +58,26 @@ const user = state({
 Let's say you want to build a simple counter that updates the DOM:
  
 ```javascript
-// ❌ The manual way (without reactivity)
+// ❌ The manual way (plain JavaScript)
 let count = 0;
  
 function updateCounter() {
-  Elements.counterDisplay.textContent = count;
-  Elements.counterBadge.textContent = count;
+  document.getElementById('counterDisplay').textContent = count;
+  document.getElementById('counterBadge').textContent = count;
  
   if (count > 0) {
-    Elements.resetButton.style.display = 'block';
+    document.getElementById('resetButton').style.display = 'block';
   } else {
-    Elements.resetButton.style.display = 'none';
+    document.getElementById('resetButton').style.display = 'none';
   }
 }
  
-Elements.incrementBtn.addEventListener('click', () => {
+document.getElementById('incrementBtn').addEventListener('click', () => {
   count++;
   updateCounter(); // Must remember to call this!
 });
  
-Elements.decrementBtn.addEventListener('click', () => {
+document.getElementById('decrementBtn').addEventListener('click', () => {
   count--;
   updateCounter(); // And this!
 });
@@ -115,8 +115,10 @@ const counter = state({ count: 0 });
  
 // Set up automatic reactions once
 effect(() => {
-  Elements.counterDisplay.textContent = counter.count;
-  Elements.counterBadge.textContent = counter.count;
+  Elements.update({
+    counterDisplay: { textContent: counter.count },
+    counterBadge: { textContent: counter.count }
+  });
 });
  
 effect(() => {
@@ -124,12 +126,17 @@ effect(() => {
 });
  
 // Just update the state - everything else happens automatically
-Elements.incrementBtn.addEventListener('click', () => {
-  counter.count++; // ✨ DOM updates automatically!
-});
- 
-Elements.decrementBtn.addEventListener('click', () => {
-  counter.count--; // ✨ DOM updates automatically!
+Elements.update({
+  incrementBtn: {
+    addEventListener: ['click', () => {
+      counter.count++; // ✨ DOM updates automatically!
+    }]
+  },
+  decrementBtn: {
+    addEventListener: ['click', () => {
+      counter.count--; // ✨ DOM updates automatically!
+    }]
+  }
 });
 ```
  
@@ -290,12 +297,14 @@ const user = state({
  
 // Auto-update DOM when state changes
 effect(() => {
-  Elements.userName.textContent = user.name;
-  Elements.userAvatar.textContent = user.avatar;
-  Elements.userStatus.update({
-    textContent: user.status,
-    classList: {
-      toggle: user.status === 'online' ? 'online' : 'offline'
+  Elements.update({
+    userName: { textContent: user.name },
+    userAvatar: { textContent: user.avatar },
+    userStatus: {
+      textContent: user.status,
+      classList: {
+        toggle: user.status === 'online' ? 'online' : 'offline'
+      }
     }
   });
 });
@@ -418,9 +427,11 @@ const formData = state({
  
 // Sync state with DOM inputs
 effect(() => {
-  Elements.usernameInput.value = formData.username;
-  Elements.emailInput.value = formData.email;
-  Elements.agreeCheckbox.checked = formData.agreed;
+  Elements.update({
+    usernameInput: { value: formData.username },
+    emailInput: { value: formData.email },
+    agreeCheckbox: { checked: formData.agreed }
+  });
 });
  
 // Enable submit button when form is valid
@@ -433,16 +444,22 @@ effect(() => {
 });
  
 // Update state from inputs
-Elements.usernameInput.addEventListener('input', (e) => {
-  formData.username = e.target.value; // ✨ Effects run automatically
-});
- 
-Elements.emailInput.addEventListener('input', (e) => {
-  formData.email = e.target.value; // ✨ Effects run automatically
-});
- 
-Elements.agreeCheckbox.addEventListener('change', (e) => {
-  formData.agreed = e.target.checked; // ✨ Effects run automatically
+Elements.update({
+  usernameInput: {
+    addEventListener: ['input', (e) => {
+      formData.username = e.target.value; // ✨ Effects run automatically
+    }]
+  },
+  emailInput: {
+    addEventListener: ['input', (e) => {
+      formData.email = e.target.value; // ✨ Effects run automatically
+    }]
+  },
+  agreeCheckbox: {
+    addEventListener: ['change', (e) => {
+      formData.agreed = e.target.checked; // ✨ Effects run automatically
+    }]
+  }
 });
 ```
  
@@ -460,8 +477,14 @@ const app = state({
  
 // Show/hide based on login status
 effect(() => {
-  Elements.loginForm.style.display = app.isLoggedIn ? 'none' : 'block';
-  Elements.dashboard.style.display = app.isLoggedIn ? 'block' : 'none';
+  Elements.update({
+    loginForm: {
+      style: { display: app.isLoggedIn ? 'none' : 'block' }
+    },
+    dashboard: {
+      style: { display: app.isLoggedIn ? 'block' : 'none' }
+    }
+  });
 });
  
 // Update welcome message
@@ -566,11 +589,13 @@ const dashboard = state({
   loading: false
 });
  
-// Update stats display using Collections
+// Update stats display
 effect(() => {
-  Elements.userCount.textContent = dashboard.stats.users.toLocaleString();
-  Elements.revenueAmount.textContent = `$${dashboard.stats.revenue.toLocaleString()}`;
-  Elements.orderCount.textContent = dashboard.stats.orders;
+  Elements.update({
+    userCount: { textContent: dashboard.stats.users.toLocaleString() },
+    revenueAmount: { textContent: `$${dashboard.stats.revenue.toLocaleString()}` },
+    orderCount: { textContent: dashboard.stats.orders }
+  });
 });
  
 // Update period selector
@@ -584,10 +609,14 @@ effect(() => {
  
 // Show loading state
 effect(() => {
-  Elements.dashboardContent.update({
-    style: { opacity: dashboard.loading ? 0.5 : 1 }
+  Elements.update({
+    dashboardContent: {
+      style: { opacity: dashboard.loading ? 0.5 : 1 }
+    },
+    loadingSpinner: {
+      style: { display: dashboard.loading ? 'block' : 'none' }
+    }
   });
-  Elements.loadingSpinner.style.display = dashboard.loading ? 'block' : 'none';
 });
  
 // Simulate data fetch
@@ -666,10 +695,10 @@ Some objects are **not made reactive** for good reasons:
 ```javascript
 const app = state({
   count: 0,
-  element: Elements.myButton,      // DOM elements stay as-is
-  date: new Date(),                // Dates stay as-is
-  regex: /test/,                   // RegEx stays as-is
-  promise: fetch('/api/data')      // Promises stay as-is
+  element: document.getElementById('myButton'),  // DOM elements stay as-is
+  date: new Date(),                              // Dates stay as-is
+  regex: /test/,                                 // RegEx stays as-is
+  promise: fetch('/api/data')                    // Promises stay as-is
 });
  
 // These work normally, not reactively
@@ -682,9 +711,9 @@ Built-in objects like DOM elements, Dates, and Promises have special behavior th
  
 ---
  
-### Comparing State to Plain Objects
+### Comparing State to Plain JavaScript
  
-**Before (Plain Object + Manual Updates):**
+**Before (Plain JavaScript + Manual Updates):**
 ```javascript
 // Plain object
 const user = {
@@ -694,8 +723,8 @@ const user = {
  
 // Manual DOM updates everywhere
 function updateProfile() {
-  Elements.userName.textContent = user.name;
-  Elements.userAge.textContent = user.age;
+  document.getElementById('userName').textContent = user.name;
+  document.getElementById('userAge').textContent = user.age;
 }
  
 user.name = 'Bob';
@@ -708,7 +737,7 @@ updateProfile(); // And this!
 updateProfile(); // Repetitive and error-prone
 ```
  
-**After (Reactive State):**
+**After (Reactive State + DOM Helpers):**
 ```javascript
 // Reactive state
 const user = state({
@@ -718,8 +747,10 @@ const user = state({
  
 // Automatic DOM updates
 effect(() => {
-  Elements.userName.textContent = user.name;
-  Elements.userAge.textContent = user.age;
+  Elements.update({
+    userName: { textContent: user.name },
+    userAge: { textContent: user.age }
+  });
 });
  
 user.name = 'Bob';  // ✨ DOM updates automatically
@@ -783,8 +814,12 @@ effect(() => {
 });
  
 // Update state from DOM Helpers events
-Elements.incrementBtn.addEventListener('click', () => {
-  counter.count++;
+Elements.update({
+  incrementBtn: {
+    addEventListener: ['click', () => {
+      counter.count++;
+    }]
+  }
 });
 ```
  
@@ -807,12 +842,17 @@ const ui = state({
 });
  
 // Toggle with simple negation
-Elements.menuToggle.addEventListener('click', () => {
-  ui.menuOpen = !ui.menuOpen;
-});
- 
-Elements.themeToggle.addEventListener('click', () => {
-  ui.darkMode = !ui.darkMode;
+Elements.update({
+  menuToggle: {
+    addEventListener: ['click', () => {
+      ui.menuOpen = !ui.menuOpen;
+    }]
+  },
+  themeToggle: {
+    addEventListener: ['click', () => {
+      ui.darkMode = !ui.darkMode;
+    }]
+  }
 });
 ```
  
@@ -823,16 +863,22 @@ Elements.themeToggle.addEventListener('click', () => {
 ```javascript
 const counter = state({ count: 0 });
  
-Elements.increment.addEventListener('click', () => {
-  counter.count++;
-});
- 
-Elements.decrement.addEventListener('click', () => {
-  counter.count--;
-});
- 
-Elements.reset.addEventListener('click', () => {
-  counter.count = 0;
+Elements.update({
+  increment: {
+    addEventListener: ['click', () => {
+      counter.count++;
+    }]
+  },
+  decrement: {
+    addEventListener: ['click', () => {
+      counter.count--;
+    }]
+  },
+  reset: {
+    addEventListener: ['click', () => {
+      counter.count = 0;
+    }]
+  }
 });
 ```
  
@@ -876,7 +922,11 @@ function reset() {
   Object.assign(app, initialState);
 }
  
-Elements.resetBtn.addEventListener('click', reset);
+Elements.update({
+  resetBtn: {
+    addEventListener: ['click', reset]
+  }
+});
 ```
  
 ---
@@ -913,4 +963,3 @@ state() + effect() + DOM Helpers = Feels like a framework, but it's just JavaScr
 ```
  
 Think of `state()` as the **foundation**. Everything else in the reactive system builds on this simple concept: **make objects smart enough to notify when they change**.
- 
