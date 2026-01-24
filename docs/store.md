@@ -21,11 +21,12 @@ const counterStore = store(
 
 // Auto-update UI
 effect(() => {
-  Elements.update({
-    count: { textContent: counterStore.count },
-    double: { textContent: counterStore.double }  // ✨ Computed!
+  Elements.textContent({
+    count: counterStore.count,
+    double: counterStore.double // ✨ Computed!
   });
 });
+
 
 // Use actions using bulk event binding
 Elements.update({
