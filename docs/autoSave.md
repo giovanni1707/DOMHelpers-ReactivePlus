@@ -32,7 +32,7 @@ console.log(state.name); // 'Jane'
 - **Cross-Tab Sync**: Synchronize state across browser tabs
 - **Expiration**: Optional time-based expiration
 - **Lifecycle Hooks**: onSave, onLoad, onSync, onError callbacks
-- **Methods**: Adds 7 methods to state object ($save, $load, $clear, etc.)
+- **Namespace Methods**: 7 methods available via ReactiveUtils (save, load, clear, etc.)
 - **Namespace Support**: Organize storage with namespaces
 
 ---
@@ -68,14 +68,15 @@ ReactiveUtils.autoSave(reactiveObj, key, options)
 ### **Returns**
 - **Type**: `void` (modifies reactiveObj in place)
 
-### **Methods Added to State**
-- **`$save()`** - Force save immediately
-- **`$load()`** - Force load from storage
-- **`$clear()`** - Clear from storage
-- **`$exists()`** - Check if exists in storage
-- **`$stopAutoSave()`** - Stop automatic saving
-- **`$startAutoSave()`** - Start automatic saving
-- **`$storageInfo()`** - Get storage information
+### **Namespace Methods for State Management**
+After calling `autoSave()`, use these namespace methods to control storage:
+- **`ReactiveUtils.save(state)`** - Force save immediately
+- **`ReactiveUtils.load(state)`** - Force load from storage
+- **`ReactiveUtils.clear(state)`** - Clear from storage
+- **`ReactiveUtils.exists(state)`** - Check if exists in storage
+- **`ReactiveUtils.stopAutoSave(state)`** - Stop automatic saving
+- **`ReactiveUtils.startAutoSave(state)`** - Start automatic saving
+- **`ReactiveUtils.storageInfo(state)`** - Get storage information
 
 ---
 
@@ -115,10 +116,10 @@ function autoSave(reactiveObj, key, options = {}) {
     });
   }
 
-  // 4. Add utility methods
+  // 4. Add internal methods (accessed via ReactiveUtils namespace)
   reactiveObj.$save = () => store.set(key, toRaw(reactiveObj));
   reactiveObj.$load = () => Object.assign(reactiveObj, store.get(key));
-  // ... more methods
+  // ... more internal methods
 }
 ```
 
@@ -126,7 +127,7 @@ function autoSave(reactiveObj, key, options = {}) {
 1. Loads existing data from storage on initialization (if autoLoad)
 2. Sets up reactive effect to auto-save on changes (with debouncing)
 3. Sets up cross-tab sync via storage events (if sync enabled)
-4. Adds utility methods to state object for manual control
+4. Adds internal methods (use via ReactiveUtils.save(state), etc.)
 5. Handles expiration, serialization, and error scenarios
 
 ---
@@ -284,22 +285,22 @@ state.count = 10;
 // Not saved yet
 
 // Check if exists
-if (state.$exists()) {
+if (ReactiveUtils.exists(state)) {
   console.log('Found existing data');
 }
 
 // Force save
-state.$save();
+ReactiveUtils.save(state);
 console.log('Saved manually');
 
 // Stop auto-save
-state.$stopAutoSave();
+ReactiveUtils.stopAutoSave(state);
 
 // Start auto-save
-state.$startAutoSave();
+ReactiveUtils.startAutoSave(state);
 
 // Get info
-console.log(state.$storageInfo());
+console.log(ReactiveUtils.storageInfo(state));
 // { key: 'counter', storage: 'localStorage', namespace: '', size: 15 }
 ```
 
@@ -312,7 +313,7 @@ ReactiveUtils.autoSave(state, 'bigData', {
     if (error.name === 'QuotaExceededError') {
       console.error('Storage quota exceeded!');
       // Clear old data or notify user
-      state.$clear();
+      ReactiveUtils.clear(state);
       alert('Storage full. Clearing old data.');
     } else {
       console.error('Storage error:', error);
@@ -512,58 +513,58 @@ ReactiveUtils.autoSave(state, 'key', {
 
 ### **Pattern 5: Manual Save**
 ```javascript
-state.$save(); // Force save
+ReactiveUtils.save(state); // Force save
 ```
 
 ---
 
 ## **Storage Methods Reference**
 
-### **`$save()` - Force Save**
+### **`save(state)` - Force Save**
 ```javascript
-state.$save();
-// Returns: void
+ReactiveUtils.save(state);
+// Returns: boolean
 // Saves immediately, bypassing debounce
 ```
 
-### **`$load()` - Force Load**
+### **`load(state)` - Force Load**
 ```javascript
-state.$load();
-// Returns: void
+ReactiveUtils.load(state);
+// Returns: boolean
 // Loads from storage, overwriting current state
 ```
 
-### **`$clear()` - Clear Storage**
+### **`clear(state)` - Clear Storage**
 ```javascript
-state.$clear();
-// Returns: void
+ReactiveUtils.clear(state);
+// Returns: boolean
 // Removes from storage
 ```
 
-### **`$exists()` - Check Existence**
+### **`exists(state)` - Check Existence**
 ```javascript
-const exists = state.$exists();
+const exists = ReactiveUtils.exists(state);
 // Returns: boolean
 // true if data exists in storage
 ```
 
-### **`$stopAutoSave()` - Stop Auto-Save**
+### **`stopAutoSave(state)` - Stop Auto-Save**
 ```javascript
-state.$stopAutoSave();
-// Returns: void
+ReactiveUtils.stopAutoSave(state);
+// Returns: Object (the state)
 // Stops automatic saving
 ```
 
-### **`$startAutoSave()` - Start Auto-Save**
+### **`startAutoSave(state)` - Start Auto-Save**
 ```javascript
-state.$startAutoSave();
-// Returns: void
+ReactiveUtils.startAutoSave(state);
+// Returns: Object (the state)
 // Starts automatic saving
 ```
 
-### **`$storageInfo()` - Get Storage Info**
+### **`storageInfo(state)` - Get Storage Info**
 ```javascript
-const info = state.$storageInfo();
+const info = ReactiveUtils.storageInfo(state);
 // Returns: { key, storage, namespace, size, exists }
 // size in bytes (approximate)
 ```
@@ -656,7 +657,7 @@ const info = state.$storageInfo();
 4. **Cross-Tab**: Synchronize state across browser tabs
 5. **Expiration**: Time-based automatic data expiration
 6. **Lifecycle**: onSave, onLoad, onSync, onError hooks
-7. **Methods**: 7 utility methods added to state object
+7. **Methods**: 7 namespace methods for manual control (save, load, clear, etc.)
 8. **Namespace**: Organize storage with key prefixes
 9. **Transform**: Modify data before save/after load
 10. **Error Handling**: Built-in quota and error management
@@ -665,4 +666,4 @@ const info = state.$storageInfo();
 
 ## **Summary**
 
-`autoSave(reactiveObj, key, options)` is a powerful utility that automatically persists reactive state to browser storage (localStorage or sessionStorage) with automatic loading, debouncing, and cross-tab synchronization. It watches the reactive object for changes and saves them to storage, with configurable debounce delays to reduce write frequency. The function supports automatic loading of saved data on initialization, making state persistence seamless across page reloads. Advanced features include cross-tab synchronization via storage events, time-based expiration, namespace organization, and lifecycle hooks (onSave, onLoad, onSync, onError) for transforming data and handling errors. The function adds seven utility methods to the state object ($save, $load, $clear, $exists, $stopAutoSave, $startAutoSave, $storageInfo) for manual control. Use debouncing for frequently changing data like editor content, enable cross-tab sync for shared application state, and implement proper error handling for storage quota issues. Transform sensitive data with onSave/onLoad callbacks to avoid storing passwords or tokens. The auto-save feature is perfect for user preferences, form drafts, shopping carts, game saves, and any state that should persist across sessions.
+`autoSave(reactiveObj, key, options)` is a powerful utility that automatically persists reactive state to browser storage (localStorage or sessionStorage) with automatic loading, debouncing, and cross-tab synchronization. It watches the reactive object for changes and saves them to storage, with configurable debounce delays to reduce write frequency. The function supports automatic loading of saved data on initialization, making state persistence seamless across page reloads. Advanced features include cross-tab synchronization via storage events, time-based expiration, namespace organization, and lifecycle hooks (onSave, onLoad, onSync, onError) for transforming data and handling errors. Seven namespace methods are available for manual control: ReactiveUtils.save(state), load(state), clear(state), exists(state), stopAutoSave(state), startAutoSave(state), and storageInfo(state). Use debouncing for frequently changing data like editor content, enable cross-tab sync for shared application state, and implement proper error handling for storage quota issues. Transform sensitive data with onSave/onLoad callbacks to avoid storing passwords or tokens. The auto-save feature is perfect for user preferences, form drafts, shopping carts, game saves, and any state that should persist across sessions.

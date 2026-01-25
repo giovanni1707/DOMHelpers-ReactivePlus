@@ -1,4 +1,4 @@
-# `$clear()` - Clear State from Storage
+# `clear(state)` - Clear State from Storage
 
 **Quick Start (30 seconds)**
 ```javascript
@@ -10,7 +10,7 @@ const state = ReactiveUtils.reactive({
 ReactiveUtils.autoSave(state, 'sessionData');
 
 // Clear from storage
-state.$clear();
+ReactiveUtils.clear(state);
 console.log('Storage cleared');
 
 // State object remains unchanged
@@ -20,9 +20,9 @@ console.log(state.user);    // Still { name: 'John' }
 
 ---
 
-## **What is `$clear()`?**
+## **What is `clear(state)`?**
 
-`$clear()` is a **method added to reactive state objects** by `autoSave()` that removes the state data from storage without modifying the current state object.
+`clear(state)` is a **method added to reactive state objects** by `autoSave()` that removes the state data from storage without modifying the current state object.
 
 **Key characteristics:**
 - **Removes from Storage**: Deletes stored data
@@ -37,11 +37,11 @@ console.log(state.user);    // Still { name: 'John' }
 ## **Syntax**
 
 ```javascript
-state.$clear()
+ReactiveUtils.clear(state)
 ```
 
 ### **Parameters**
-- None
+- **`state`** (Object): Storage-enabled reactive state object
 
 ### **Returns**
 - **Type**: `void`
@@ -67,7 +67,7 @@ state.$clear = function() {
 **What happens:**
 1. Removes the key from storage (localStorage or sessionStorage)
 2. State object values remain unchanged
-3. Future $load() calls will return false
+3. Future load(state) calls will return false
 4. Auto-load on page refresh will not load this data
 
 ---
@@ -84,7 +84,7 @@ const session = ReactiveUtils.reactive({
 ReactiveUtils.autoSave(session, 'session');
 
 function logout() {
-  session.$clear();
+  ReactiveUtils.clear(session);
   session.token = null;
   session.userId = null;
   redirectToLogin();
@@ -101,7 +101,7 @@ const cache = ReactiveUtils.reactive({
 ReactiveUtils.autoSave(cache, 'cache');
 
 function clearCache() {
-  cache.$clear();
+  cache.clear(state);
   cache.data = [];
   cache.timestamp = Date.now();
   console.log('Cache cleared');
@@ -120,7 +120,7 @@ ReactiveUtils.autoSave(settings, 'settings');
 
 function resetSettings() {
   // Clear stored settings
-  settings.$clear();
+  settings.clear(state);
 
   // Reset to defaults
   settings.theme = 'light';
@@ -128,7 +128,7 @@ function resetSettings() {
   settings.notifications = false;
 
   // Save new defaults
-  settings.$save();
+  settings.save(state);
 }
 ```
 
@@ -142,7 +142,7 @@ ReactiveUtils.autoSave(data, 'data', {
   onLoad: (value) => {
     if (!isValid(value)) {
       // Clear corrupted data
-      data.$clear();
+      data.clear(state);
       return getDefaults();
     }
     return value;
@@ -162,7 +162,7 @@ document.getElementById('submitBtn').addEventListener('click', () => {
   submitForm(temp.formData);
 
   // Clear after successful submit
-  temp.$clear();
+  ReactiveUtils.clear(temp);
   temp.formData = {};
 });
 ```
@@ -180,7 +180,7 @@ function publishAndClear() {
   publishPost(draft);
 
   // Clear draft after publishing
-  draft.$clear();
+  draft.clear(state);
   draft.title = '';
   draft.content = '';
 
@@ -199,9 +199,9 @@ ReactiveUtils.autoSave(prefs, 'prefs');
 ReactiveUtils.autoSave(cache, 'cache');
 
 function clearAll() {
-  user.$clear();
-  prefs.$clear();
-  cache.$clear();
+  user.clear(state);
+  prefs.clear(state);
+  cache.clear(state);
   console.log('All storage cleared');
 }
 ```
@@ -217,7 +217,7 @@ ReactiveUtils.autoSave(state, 'state');
 
 window.addEventListener('beforeunload', () => {
   if (!state.shouldPersist) {
-    state.$clear();
+    ReactiveUtils.clear(state);
   }
 });
 ```
@@ -232,7 +232,7 @@ const browsing = ReactiveUtils.reactive({
 ReactiveUtils.autoSave(browsing, 'browsing');
 
 function enablePrivacyMode() {
-  browsing.$clear();
+  browsing.clear(state);
   browsing.history = [];
   browsing.bookmarks = [];
   console.log('Privacy mode enabled');
@@ -251,7 +251,7 @@ ReactiveUtils.autoSave(cache, 'cache');
 function checkExpiration() {
   if (cache.expiresAt && Date.now() > cache.expiresAt) {
     console.log('Data expired, clearing');
-    cache.$clear();
+    cache.clear(state);
     cache.value = null;
     cache.expiresAt = null;
   }
@@ -264,36 +264,36 @@ function checkExpiration() {
 
 ### **Pattern 1: Clear and Reset**
 ```javascript
-state.$clear();
+ReactiveUtils.clear(state);
 state.value = defaultValue;
 ```
 
 ### **Pattern 2: Clear on Logout**
 ```javascript
 function logout() {
-  session.$clear();
+  ReactiveUtils.clear(session);
   redirectToLogin();
 }
 ```
 
 ### **Pattern 3: Clear and Save New**
 ```javascript
-state.$clear();
+ReactiveUtils.clear(state);
 state.data = newData;
-state.$save();
+ReactiveUtils.save(state);
 ```
 
 ### **Pattern 4: Clear Temporary**
 ```javascript
 if (isTemporary) {
-  state.$clear();
+  ReactiveUtils.clear(state);
 }
 ```
 
 ### **Pattern 5: Clear on Complete**
 ```javascript
 onComplete(() => {
-  state.$clear();
+  ReactiveUtils.clear(state);
 });
 ```
 
@@ -301,7 +301,7 @@ onComplete(() => {
 
 ## **When to Use**
 
-| Scenario | Use $clear() |
+| Scenario | Use clear() |
 |----------|--------------|
 | Logout | ✓ Yes |
 | Clear cache | ✓ Yes |
@@ -317,28 +317,28 @@ onComplete(() => {
 
 ### **Storage vs State**
 ```javascript
-// $clear() only affects storage
-state.$clear();
+// clear(state) only affects storage
+ReactiveUtils.clear(state);
 console.log(state.value); // Still has value
 
 // To clear both:
-state.$clear();
+ReactiveUtils.clear(state);
 state.value = null;
 ```
 
 ### **Cannot Undo**
 ```javascript
-state.$clear();
+ReactiveUtils.clear(state);
 // Data is permanently removed from storage
-// Cannot be recovered with $load()
+// Cannot be recovered with load(state)
 ```
 
 ### **Future Loads**
 ```javascript
-state.$clear();
+ReactiveUtils.clear(state);
 
 // Later...
-const loaded = state.$load(); // Returns false
+const loaded = ReactiveUtils.load(state); // Returns false
 ```
 
 ---
@@ -347,9 +347,9 @@ const loaded = state.$load(); // Returns false
 
 | Operation | Storage | State Object |
 |-----------|---------|--------------|
-| `$clear()` | Cleared | Unchanged |
+| `clear(state)` | Cleared | Unchanged |
 | `state.prop = null` | Auto-saved (if enabled) | Changed |
-| `$clear() + reset` | Cleared then saved | Changed then saved |
+| `clear(state) + reset` | Cleared then saved | Changed then saved |
 
 ---
 
@@ -357,35 +357,35 @@ const loaded = state.$load(); // Returns false
 
 1. **Clear and reset together**
    ```javascript
-   state.$clear();
+   ReactiveUtils.clear(state);
    state.value = defaultValue;
    ```
 
 2. **Clear sensitive data on logout**
    ```javascript
    function logout() {
-     session.$clear();
-     authToken.$clear();
+     ReactiveUtils.clear(session);
+     ReactiveUtils.clear(authToken);
    }
    ```
 
 3. **Confirm before clearing**
    ```javascript
    if (confirm('Clear all data?')) {
-     state.$clear();
+     ReactiveUtils.clear(state);
    }
    ```
 
 4. **Clear temporary data after use**
    ```javascript
    processData(temp.value);
-   temp.$clear();
+   ReactiveUtils.clear(temp);
    ```
 
 5. **Clear on privacy actions**
    ```javascript
    function clearHistory() {
-     history.$clear();
+     history.clear(state);
      history.items = [];
    }
    ```
@@ -394,7 +394,7 @@ const loaded = state.$load(); // Returns false
    ```javascript
    // Clears saved preferences
    // User will see defaults on next visit
-   prefs.$clear();
+   prefs.clear(state);
    ```
 
 ---
@@ -405,7 +405,7 @@ const loaded = state.$load(); // Returns false
 2. **Keeps State**: State object remains unchanged
 3. **No Return**: Returns void
 4. **Permanent**: Cannot be undone
-5. **Affects Load**: Future $load() will return false
+5. **Affects Load**: Future load(state) will return false
 6. **Manual**: Requires explicit call
 7. **Privacy**: Good for sensitive data
 8. **Cleanup**: Use for temporary data
@@ -416,4 +416,4 @@ const loaded = state.$load(); // Returns false
 
 ## **Summary**
 
-`$clear()` is a method added to reactive state objects by `autoSave()` that removes the state data from storage without modifying the current state object. When called, it permanently deletes the stored data from localStorage or sessionStorage, but leaves the in-memory state object unchanged. This means the current state values remain available, but future page loads will not auto-load this data and $load() calls will return false. Use `$clear()` when you need to remove persisted data from storage, such as during logout to clear sensitive session data, when implementing privacy modes, when resetting to default settings, after completing temporary operations, or when clearing cache. It's perfect for cleanup operations where you want to prevent data from persisting across page reloads. Typically used in combination with resetting state values to defaults, though the operations are independent - clearing storage doesn't automatically reset the state object.
+`clear(state)` is a method added to reactive state objects by `autoSave()` that removes the state data from storage without modifying the current state object. When called, it permanently deletes the stored data from localStorage or sessionStorage, but leaves the in-memory state object unchanged. This means the current state values remain available, but future page loads will not auto-load this data and load(state) calls will return false. Use `clear(state)` when you need to remove persisted data from storage, such as during logout to clear sensitive session data, when implementing privacy modes, when resetting to default settings, after completing temporary operations, or when clearing cache. It's perfect for cleanup operations where you want to prevent data from persisting across page reloads. Typically used in combination with resetting state values to defaults, though the operations are independent - clearing storage doesn't automatically reset the state object.

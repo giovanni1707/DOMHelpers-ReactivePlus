@@ -1,4 +1,4 @@
-# `$stopAutoSave()` - Stop Automatic Saving
+# `stopAutoSave(state)` - Stop Automatic Saving
 
 **Quick Start (30 seconds)**
 ```javascript
@@ -15,21 +15,21 @@ ReactiveUtils.autoSave(state, 'myState', {
 state.count = 1; // Saves after 500ms
 
 // Stop auto-saving
-state.$stopAutoSave();
+ReactiveUtils.stopAutoSave(state);
 
 // Changes no longer auto-save
 state.count = 2; // Not saved
 state.data = [1, 2, 3]; // Not saved
 
 // Can still save manually
-state.$save();
+ReactiveUtils.save(state);
 ```
 
 ---
 
-## **What is `$stopAutoSave()`?**
+## **What is `stopAutoSave(state)`?**
 
-`$stopAutoSave()` is a **method added to reactive state objects** by `autoSave()` that temporarily disables automatic saving while keeping all other functionality intact.
+`stopAutoSave(state)` is a **method added to reactive state objects** by `autoSave()` that temporarily disables automatic saving while keeping all other functionality intact.
 
 **Key characteristics:**
 - **Stops Auto-Save**: Disables automatic saving on changes
@@ -44,11 +44,11 @@ state.$save();
 ## **Syntax**
 
 ```javascript
-state.$stopAutoSave()
+ReactiveUtils.stopAutoSave(state)
 ```
 
 ### **Parameters**
-- None
+- **`state`** (Object): Storage-enabled reactive state object
 
 ### **Returns**
 - **Type**: `void`
@@ -169,14 +169,14 @@ ReactiveUtils.autoSave(state, 'state');
 
 window.addEventListener('offline', () => {
   state.isOnline = false;
-  state.$stopAutoSave();
+  ReactiveUtils.stopAutoSave(state);
   console.log('Auto-save disabled (offline)');
 });
 
 window.addEventListener('online', () => {
   state.isOnline = true;
-  state.$save(); // Sync when back online
-  state.$startAutoSave();
+  ReactiveUtils.save(state); // Sync when back online
+  ReactiveUtils.startAutoSave(state);
   console.log('Auto-save enabled (online)');
 });
 ```
@@ -190,14 +190,14 @@ const state = ReactiveUtils.reactive({
 ReactiveUtils.autoSave(state, 'state');
 
 function performBulkOperation() {
-  state.$stopAutoSave();
+  ReactiveUtils.stopAutoSave(state);
 
   for (let i = 0; i < 1000; i++) {
     state.value = i; // Would save 1000 times without stop
   }
 
-  state.$save(); // Save once
-  state.$startAutoSave();
+  ReactiveUtils.save(state); // Save once
+  ReactiveUtils.startAutoSave(state);
 }
 ```
 
@@ -277,13 +277,13 @@ const state = ReactiveUtils.reactive({
 ReactiveUtils.autoSave(state, 'records');
 
 async function importRecords(file) {
-  state.$stopAutoSave();
+  ReactiveUtils.stopAutoSave(state);
 
   const data = await parseFile(file);
   state.records = data; // Large data import
 
-  state.$save();
-  state.$startAutoSave();
+  ReactiveUtils.save(state);
+  ReactiveUtils.startAutoSave(state);
 
   console.log(`Imported ${data.length} records`);
 }
@@ -309,41 +309,41 @@ if (process.env.NODE_ENV === 'test') {
 
 ### **Pattern 1: Stop-Update-Resume**
 ```javascript
-state.$stopAutoSave();
+ReactiveUtils.stopAutoSave(state);
 // Make changes
-state.$startAutoSave();
+ReactiveUtils.startAutoSave(state);
 ```
 
 ### **Pattern 2: Stop-Update-Save-Resume**
 ```javascript
-state.$stopAutoSave();
+ReactiveUtils.stopAutoSave(state);
 // Make changes
-state.$save();
-state.$startAutoSave();
+ReactiveUtils.save(state);
+ReactiveUtils.startAutoSave(state);
 ```
 
 ### **Pattern 3: Conditional Stop**
 ```javascript
 if (shouldStopAutoSave) {
-  state.$stopAutoSave();
+  ReactiveUtils.stopAutoSave(state);
 }
 ```
 
 ### **Pattern 4: Batch Updates**
 ```javascript
-state.$stopAutoSave();
+ReactiveUtils.stopAutoSave(state);
 batchUpdate(state);
-state.$save();
-state.$startAutoSave();
+ReactiveUtils.save(state);
+ReactiveUtils.startAutoSave(state);
 ```
 
 ### **Pattern 5: Toggle Auto-Save**
 ```javascript
 function toggleAutoSave(enabled) {
   if (enabled) {
-    state.$startAutoSave();
+    ReactiveUtils.startAutoSave(state);
   } else {
-    state.$stopAutoSave();
+    ReactiveUtils.stopAutoSave(state);
   }
 }
 ```
@@ -370,7 +370,7 @@ function toggleAutoSave(enabled) {
 
 ### **State Remains Reactive**
 ```javascript
-state.$stopAutoSave();
+ReactiveUtils.stopAutoSave(state);
 // State still reactive, just doesn't save
 ReactiveUtils.effect(() => {
   console.log(state.value); // Still runs on changes
@@ -379,23 +379,23 @@ ReactiveUtils.effect(() => {
 
 ### **Manual Save Still Works**
 ```javascript
-state.$stopAutoSave();
+ReactiveUtils.stopAutoSave(state);
 state.value = 'new';
-state.$save(); // This still works
+ReactiveUtils.save(state); // This still works
 ```
 
 ### **Can Be Resumed**
 ```javascript
-state.$stopAutoSave();
+ReactiveUtils.stopAutoSave(state);
 // Later
-state.$startAutoSave(); // Resumes auto-save
+ReactiveUtils.startAutoSave(state); // Resumes auto-save
 ```
 
 ---
 
 ## **vs. autoSave: false**
 
-| Feature | `$stopAutoSave()` | `autoSave: false` option |
+| Feature | `stopAutoSave(state)` | `autoSave: false` option |
 |---------|------------------|-------------------------|
 | When set | Runtime | Initialization |
 | Reversible | ✓ Yes ($startAutoSave) | ✗ No |
@@ -407,8 +407,8 @@ ReactiveUtils.autoSave(state, 'key', { autoSave: false });
 
 // Method: Can toggle at runtime
 ReactiveUtils.autoSave(state, 'key');
-state.$stopAutoSave(); // Disable
-state.$startAutoSave(); // Enable
+ReactiveUtils.stopAutoSave(state); // Disable
+ReactiveUtils.startAutoSave(state); // Enable
 ```
 
 ---
@@ -417,50 +417,50 @@ state.$startAutoSave(); // Enable
 
 1. **Always resume after batch updates**
    ```javascript
-   state.$stopAutoSave();
+   ReactiveUtils.stopAutoSave(state);
    batchUpdate();
-   state.$save();
-   state.$startAutoSave(); // Don't forget!
+   ReactiveUtils.save(state);
+   ReactiveUtils.startAutoSave(state); // Don't forget!
    ```
 
 2. **Use for performance**
    ```javascript
    // Stop during intensive operations
-   state.$stopAutoSave();
+   ReactiveUtils.stopAutoSave(state);
    performIntensiveOperation();
-   state.$save();
-   state.$startAutoSave();
+   ReactiveUtils.save(state);
+   ReactiveUtils.startAutoSave(state);
    ```
 
 3. **Combine with manual save**
    ```javascript
-   state.$stopAutoSave();
+   ReactiveUtils.stopAutoSave(state);
    makeChanges();
-   state.$save(); // Save when done
-   state.$startAutoSave();
+   ReactiveUtils.save(state); // Save when done
+   ReactiveUtils.startAutoSave(state);
    ```
 
 4. **Use for user preferences**
    ```javascript
    if (userPrefs.disableAutoSave) {
-     state.$stopAutoSave();
+     ReactiveUtils.stopAutoSave(state);
    }
    ```
 
 5. **Handle offline scenarios**
    ```javascript
    if (!navigator.onLine) {
-     state.$stopAutoSave();
+     ReactiveUtils.stopAutoSave(state);
    }
    ```
 
 6. **Clean up properly**
    ```javascript
    try {
-     state.$stopAutoSave();
+     ReactiveUtils.stopAutoSave(state);
      doWork();
    } finally {
-     state.$startAutoSave();
+     ReactiveUtils.startAutoSave(state);
    }
    ```
 
@@ -483,4 +483,4 @@ state.$startAutoSave(); // Enable
 
 ## **Summary**
 
-`$stopAutoSave()` is a method added to reactive state objects by `autoSave()` that temporarily disables automatic saving while keeping all other functionality intact. When called, it removes the reactive effect that watches for state changes and triggers saves, but the state itself remains reactive and all other methods ($save, $load, etc.) continue to work normally. Use `$stopAutoSave()` when making batch updates to avoid multiple save operations, during large data imports that would trigger many saves, for performance optimization in intensive operations, when implementing offline mode, for privacy modes where saving should be disabled, in test environments, or when giving users control over auto-save behavior. Always pair `$stopAutoSave()` with `$startAutoSave()` to resume automatic saving when done, and consider using manual `$save()` calls before resuming to ensure changes are persisted. The method is reversible and can be toggled at runtime, unlike the autoSave option which is set at initialization.
+`stopAutoSave(state)` is a method added to reactive state objects by `autoSave()` that temporarily disables automatic saving while keeping all other functionality intact. When called, it removes the reactive effect that watches for state changes and triggers saves, but the state itself remains reactive and all other methods ($save, $load, etc.) continue to work normally. Use `stopAutoSave(state)` when making batch updates to avoid multiple save operations, during large data imports that would trigger many saves, for performance optimization in intensive operations, when implementing offline mode, for privacy modes where saving should be disabled, in test environments, or when giving users control over auto-save behavior. Always pair `stopAutoSave(state)` with `$startAutoSave()` to resume automatic saving when done, and consider using manual `$save()` calls before resuming to ensure changes are persisted. The method is reversible and can be toggled at runtime, unlike the autoSave option which is set at initialization.

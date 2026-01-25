@@ -1,4 +1,4 @@
-# `$storageInfo()` - Get Storage Information
+# `storageInfo(state)` - Get Storage Information
 
 **Quick Start (30 seconds)**
 ```javascript
@@ -13,7 +13,7 @@ ReactiveUtils.autoSave(state, 'myData', {
 });
 
 // Get storage information
-const info = state.$storageInfo();
+const info = ReactiveUtils.storageInfo(state);
 console.log(info);
 // {
 //   key: 'myData',
@@ -29,9 +29,9 @@ console.log(info);
 
 ---
 
-## **What is `$storageInfo()`?**
+## **What is `storageInfo(state)`?**
 
-`$storageInfo()` is a **method added to reactive state objects** by `autoSave()` that returns detailed information about the storage configuration and current state.
+`storageInfo(state)` is a **method added to reactive state objects** by `autoSave()` that returns detailed information about the storage configuration and current state.
 
 **Key characteristics:**
 - **Returns Object**: Detailed configuration information
@@ -46,11 +46,11 @@ console.log(info);
 ## **Syntax**
 
 ```javascript
-state.$storageInfo()
+ReactiveUtils.storageInfo(state)
 ```
 
 ### **Parameters**
-- None
+- **`state`** (Object): Storage-enabled reactive state object
 
 ### **Returns**
 - **Type**: `Object` with the following properties:
@@ -116,7 +116,7 @@ state.$storageInfo = function() {
 const state = ReactiveUtils.reactive({ value: 123 });
 ReactiveUtils.autoSave(state, 'data');
 
-const info = state.$storageInfo();
+const info = ReactiveUtils.storageInfo(state);
 console.log(`Stored as: ${info.fullKey}`);
 console.log(`Storage type: ${info.storage}`);
 console.log(`Size: ${info.size} bytes`);
@@ -131,7 +131,7 @@ ReactiveUtils.autoSave(state, 'appData', {
 });
 
 function showDebugInfo() {
-  const info = state.$storageInfo();
+  const info = ReactiveUtils.storageInfo(state);
 
   console.group('Storage Debug Info');
   console.log('Key:', info.key);
@@ -195,7 +195,7 @@ ReactiveUtils.autoSave(state, 'data', {
 });
 
 function validateStorageConfig() {
-  const info = state.$storageInfo();
+  const info = ReactiveUtils.storageInfo(state);
 
   if (info.storage !== 'localStorage') {
     console.warn('Expected localStorage');
@@ -215,7 +215,7 @@ const state = ReactiveUtils.reactive({ items: [] });
 ReactiveUtils.autoSave(state, 'items', { namespace: 'shop' });
 
 function generateStorageReport() {
-  const info = state.$storageInfo();
+  const info = ReactiveUtils.storageInfo(state);
 
   return {
     location: `${info.storage} -> ${info.fullKey}`,
@@ -304,7 +304,7 @@ ReactiveUtils.autoSave(state, 'debug', { debounce: 2000 });
 
 // Add to window for console access
 window.debugStorage = () => {
-  const info = state.$storageInfo();
+  const info = ReactiveUtils.storageInfo(state);
 
   console.table({
     'Storage Key': info.fullKey,
@@ -329,31 +329,31 @@ window.debugStorage = () => {
 
 ### **Pattern 1: Get Basic Info**
 ```javascript
-const info = state.$storageInfo();
+const info = ReactiveUtils.storageInfo(state);
 console.log(info.key, info.size);
 ```
 
 ### **Pattern 2: Check Existence**
 ```javascript
-if (state.$storageInfo().exists) {
+if (ReactiveUtils.storageInfo(state).exists) {
   // Data exists
 }
 ```
 
 ### **Pattern 3: Monitor Size**
 ```javascript
-const size = state.$storageInfo().size;
+const size = ReactiveUtils.storageInfo(state).size;
 console.log(`${size} bytes`);
 ```
 
 ### **Pattern 4: Check Auto-Save Status**
 ```javascript
-const enabled = state.$storageInfo().autoSaveEnabled;
+const enabled = ReactiveUtils.storageInfo(state).autoSaveEnabled;
 ```
 
 ### **Pattern 5: Debug Output**
 ```javascript
-console.table(state.$storageInfo());
+console.table(ReactiveUtils.storageInfo(state));
 ```
 
 ---
@@ -363,35 +363,35 @@ console.table(state.$storageInfo());
 ### **`key`** (string)
 The storage key without namespace
 ```javascript
-const info = state.$storageInfo();
+const info = ReactiveUtils.storageInfo(state);
 console.log(info.key); // 'myData'
 ```
 
 ### **`fullKey`** (string)
 The complete storage key with namespace
 ```javascript
-const info = state.$storageInfo();
+const info = ReactiveUtils.storageInfo(state);
 console.log(info.fullKey); // 'app:myData'
 ```
 
 ### **`storage`** (string)
 Storage type: 'localStorage' or 'sessionStorage'
 ```javascript
-const info = state.$storageInfo();
+const info = ReactiveUtils.storageInfo(state);
 console.log(info.storage); // 'localStorage'
 ```
 
 ### **`namespace`** (string)
 Namespace prefix (empty string if none)
 ```javascript
-const info = state.$storageInfo();
+const info = ReactiveUtils.storageInfo(state);
 console.log(info.namespace); // 'app' or ''
 ```
 
 ### **`exists`** (boolean)
 Whether data exists in storage
 ```javascript
-const info = state.$storageInfo();
+const info = ReactiveUtils.storageInfo(state);
 if (info.exists) {
   console.log('Data is stored');
 }
@@ -400,7 +400,7 @@ if (info.exists) {
 ### **`size`** (number)
 Approximate size in bytes (0 if not exists)
 ```javascript
-const info = state.$storageInfo();
+const info = ReactiveUtils.storageInfo(state);
 console.log(`${info.size} bytes`);
 console.log(`${(info.size / 1024).toFixed(2)} KB`);
 ```
@@ -408,7 +408,7 @@ console.log(`${(info.size / 1024).toFixed(2)} KB`);
 ### **`autoSaveEnabled`** (boolean)
 Whether auto-save is currently enabled
 ```javascript
-const info = state.$storageInfo();
+const info = ReactiveUtils.storageInfo(state);
 if (!info.autoSaveEnabled) {
   console.log('Auto-save is disabled');
 }
@@ -417,7 +417,7 @@ if (!info.autoSaveEnabled) {
 ### **`debounce`** (number)
 Debounce delay in milliseconds
 ```javascript
-const info = state.$storageInfo();
+const info = ReactiveUtils.storageInfo(state);
 console.log(`Save delay: ${info.debounce}ms`);
 ```
 
@@ -425,7 +425,7 @@ console.log(`Save delay: ${info.debounce}ms`);
 
 ## **When to Use**
 
-| Scenario | Use $storageInfo() |
+| Scenario | Use storageInfo() |
 |----------|-------------------|
 | Debugging | ✓ Yes |
 | Monitoring | ✓ Yes |
@@ -441,12 +441,12 @@ console.log(`Save delay: ${info.debounce}ms`);
 
 1. **Use for debugging**
    ```javascript
-   console.table(state.$storageInfo());
+   console.table(ReactiveUtils.storageInfo(state));
    ```
 
 2. **Monitor storage usage**
    ```javascript
-   const info = state.$storageInfo();
+   const info = ReactiveUtils.storageInfo(state);
    if (info.size > threshold) {
      warnUser();
    }
@@ -454,13 +454,13 @@ console.log(`Save delay: ${info.debounce}ms`);
 
 3. **Display status to users**
    ```javascript
-   const info = state.$storageInfo();
+   const info = ReactiveUtils.storageInfo(state);
    showStatus(`Saved (${info.size} bytes)`);
    ```
 
 4. **Validate configuration**
    ```javascript
-   const info = state.$storageInfo();
+   const info = ReactiveUtils.storageInfo(state);
    assert(info.storage === 'localStorage');
    ```
 
@@ -472,7 +472,7 @@ console.log(`Save delay: ${info.debounce}ms`);
 
 6. **Check before operations**
    ```javascript
-   if (!state.$storageInfo().exists) {
+   if (!ReactiveUtils.storageInfo(state).exists) {
      initializeDefaults();
    }
    ```
@@ -496,4 +496,4 @@ console.log(`Save delay: ${info.debounce}ms`);
 
 ## **Summary**
 
-`$storageInfo()` is a method added to reactive state objects by `autoSave()` that returns detailed information about the storage configuration and current state. When called, it returns an object containing the storage key, full key with namespace, storage type (localStorage/sessionStorage), namespace, whether data exists in storage, approximate size in bytes, current auto-save enabled status, and debounce delay. This is a read-only, non-destructive operation that provides a complete snapshot of the storage configuration and state. Use `$storageInfo()` for debugging storage issues, monitoring storage usage, displaying status information to users, validating configuration, building admin panels, or checking storage state before operations. The returned information is particularly useful during development for understanding how data is stored, tracking storage consumption across multiple states, and verifying that auto-save is configured and operating as expected.
+`storageInfo(state)` is a method added to reactive state objects by `autoSave()` that returns detailed information about the storage configuration and current state. When called, it returns an object containing the storage key, full key with namespace, storage type (localStorage/sessionStorage), namespace, whether data exists in storage, approximate size in bytes, current auto-save enabled status, and debounce delay. This is a read-only, non-destructive operation that provides a complete snapshot of the storage configuration and state. Use `storageInfo(state)` for debugging storage issues, monitoring storage usage, displaying status information to users, validating configuration, building admin panels, or checking storage state before operations. The returned information is particularly useful during development for understanding how data is stored, tracking storage consumption across multiple states, and verifying that auto-save is configured and operating as expected.

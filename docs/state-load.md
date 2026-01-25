@@ -42,7 +42,7 @@ ReactiveUtils.load(state)
 ```
 
 ### **Parameters**
-- None
+- **`state`** (Object): Storage-enabled reactive state object
 
 ### **Returns**
 - **Type**: `boolean`
@@ -98,7 +98,7 @@ ReactiveUtils.autoSave(settings, 'settings', {
 });
 
 // Load when needed
-if (settings.$load()) {
+if (settings.load(state)) {
   console.log('Settings loaded');
 } else {
   console.log('No saved settings');
@@ -118,7 +118,7 @@ data.items = [1, 2, 3];
 
 // Discard changes and reload
 function revertChanges() {
-  if (data.$load()) {
+  if (data.load(state)) {
     console.log('Changes reverted');
   }
 }
@@ -136,7 +136,7 @@ ReactiveUtils.autoSave(config, 'config', {
 });
 
 // Try to load, use defaults if not found
-if (!config.$load()) {
+if (!config.load(state)) {
   console.log('Using default configuration');
 }
 ```
@@ -154,7 +154,7 @@ ReactiveUtils.autoSave(cache, 'cache', {
 
 function loadIfNeeded() {
   if (shouldUseCache()) {
-    if (cache.$load()) {
+    if (cache.load(state)) {
       console.log('Using cached data');
       return true;
     }
@@ -192,7 +192,7 @@ function switchProfile(profileName) {
     autoLoad: false
   });
 
-  if (profile.$load()) {
+  if (profile.load(state)) {
     console.log(`Loaded profile: ${profileName}`);
   } else {
     console.log(`No profile found: ${profileName}`);
@@ -212,7 +212,7 @@ ReactiveUtils.autoSave(sharedState, 'messages');
 
 // Sync from another tab's changes
 document.getElementById('syncBtn').addEventListener('click', () => {
-  if (sharedState.$load()) {
+  if (sharedState.load(state)) {
     console.log('Synced with latest data');
   }
 });
@@ -235,7 +235,7 @@ ReactiveUtils.autoSave(data, 'data', {
   }
 });
 
-data.$load(); // Will validate and use defaults if invalid
+data.load(state); // Will validate and use defaults if invalid
 ```
 
 ### **Example 9: Reload on Error**
@@ -267,11 +267,11 @@ ReactiveUtils.autoSave(editor, 'document');
 function loadDocument() {
   if (editor.hasUnsavedChanges) {
     if (confirm('Discard unsaved changes?')) {
-      editor.$load();
+      editor.load(state);
       editor.hasUnsavedChanges = false;
     }
   } else {
-    editor.$load();
+    editor.load(state);
   }
 }
 ```
@@ -320,7 +320,7 @@ function revert() {
 
 ## **When to Use**
 
-| Scenario | Use $load() |
+| Scenario | Use load() |
 |----------|-------------|
 | Manual load control | ✓ Yes |
 | Reload from storage | ✓ Yes |

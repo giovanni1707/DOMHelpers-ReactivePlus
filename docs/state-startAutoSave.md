@@ -1,4 +1,4 @@
-# `$startAutoSave()` - Start Automatic Saving
+# `startAutoSave(state)` - Start Automatic Saving
 
 **Quick Start (30 seconds)**
 ```javascript
@@ -15,7 +15,7 @@ ReactiveUtils.autoSave(state, 'myState', {
 state.count = 1; // Not saved
 
 // Enable auto-save
-state.$startAutoSave();
+ReactiveUtils.startAutoSave(state);
 
 // Now changes auto-save
 state.count = 2; // Auto-saved
@@ -24,9 +24,9 @@ state.data = [1, 2, 3]; // Auto-saved
 
 ---
 
-## **What is `$startAutoSave()`?**
+## **What is `startAutoSave(state)`?**
 
-`$startAutoSave()` is a **method added to reactive state objects** by `autoSave()` that enables or resumes automatic saving after it has been disabled.
+`startAutoSave(state)` is a **method added to reactive state objects** by `autoSave()` that enables or resumes automatic saving after it has been disabled.
 
 **Key characteristics:**
 - **Enables Auto-Save**: Activates automatic saving
@@ -41,11 +41,11 @@ state.data = [1, 2, 3]; // Auto-saved
 ## **Syntax**
 
 ```javascript
-state.$startAutoSave()
+ReactiveUtils.startAutoSave(state)
 ```
 
 ### **Parameters**
-- None
+- **`state`** (Object): Storage-enabled reactive state object
 
 ### **Returns**
 - **Type**: `void`
@@ -143,15 +143,15 @@ window.addEventListener('online', () => {
   state.isOnline = true;
 
   // Sync and resume auto-save
-  state.$save();
-  state.$startAutoSave();
+  ReactiveUtils.save(state);
+  ReactiveUtils.startAutoSave(state);
 
   console.log('Back online, auto-save enabled');
 });
 
 window.addEventListener('offline', () => {
   state.isOnline = false;
-  state.$stopAutoSave();
+  ReactiveUtils.stopAutoSave(state);
 
   console.log('Offline, auto-save disabled');
 });
@@ -193,14 +193,14 @@ const state = ReactiveUtils.reactive({
 ReactiveUtils.autoSave(state, 'records');
 
 async function importData(file) {
-  state.$stopAutoSave();
+  ReactiveUtils.stopAutoSave(state);
 
   const data = await parseFile(file);
   state.records = data;
-  state.$save();
+  ReactiveUtils.save(state);
 
   // Resume auto-save for future edits
-  state.$startAutoSave();
+  ReactiveUtils.startAutoSave(state);
 
   console.log('Import complete, auto-save resumed');
 }
@@ -244,7 +244,7 @@ state.data = getInitialData();
 state.initialized = true;
 
 // Now enable auto-save for user changes
-state.$startAutoSave();
+ReactiveUtils.startAutoSave(state);
 ```
 
 ### **Example 8: Privacy Mode Toggle**
@@ -327,40 +327,40 @@ function checkFeatureFlags() {
 
 ### **Pattern 1: Resume After Stop**
 ```javascript
-state.$stopAutoSave();
+ReactiveUtils.stopAutoSave(state);
 // Do work
-state.$startAutoSave();
+ReactiveUtils.startAutoSave(state);
 ```
 
 ### **Pattern 2: Enable on Init**
 ```javascript
 ReactiveUtils.autoSave(state, 'key', { autoSave: false });
-state.$startAutoSave(); // Enable when ready
+ReactiveUtils.startAutoSave(state); // Enable when ready
 ```
 
 ### **Pattern 3: Toggle Based on Condition**
 ```javascript
 if (shouldAutoSave) {
-  state.$startAutoSave();
+  ReactiveUtils.startAutoSave(state);
 } else {
-  state.$stopAutoSave();
+  ReactiveUtils.stopAutoSave(state);
 }
 ```
 
 ### **Pattern 4: Enable After Import**
 ```javascript
 importData();
-state.$save();
-state.$startAutoSave();
+ReactiveUtils.save(state);
+ReactiveUtils.startAutoSave(state);
 ```
 
 ### **Pattern 5: User Control**
 ```javascript
 function setAutoSave(enabled) {
   if (enabled) {
-    state.$startAutoSave();
+    ReactiveUtils.startAutoSave(state);
   } else {
-    state.$stopAutoSave();
+    ReactiveUtils.stopAutoSave(state);
   }
 }
 ```
@@ -386,20 +386,20 @@ function setAutoSave(enabled) {
 
 ### **Idempotent**
 ```javascript
-state.$startAutoSave();
-state.$startAutoSave(); // Safe to call multiple times
+ReactiveUtils.startAutoSave(state);
+ReactiveUtils.startAutoSave(state); // Safe to call multiple times
 ```
 
 ### **Immediate Effect**
 ```javascript
-state.$startAutoSave();
+ReactiveUtils.startAutoSave(state);
 state.value = 'new'; // Immediately auto-saved
 ```
 
 ### **Respects Settings**
 ```javascript
 ReactiveUtils.autoSave(state, 'key', { debounce: 1000 });
-state.$startAutoSave();
+ReactiveUtils.startAutoSave(state);
 // Still uses 1000ms debounce
 ```
 
@@ -407,7 +407,7 @@ state.$startAutoSave();
 
 ## **vs. autoSave: true**
 
-| Feature | `$startAutoSave()` | `autoSave: true` option |
+| Feature | `startAutoSave(state)` | `autoSave: true` option |
 |---------|-------------------|------------------------|
 | When set | Runtime | Initialization |
 | Dynamic | ✓ Yes | ✗ No |
@@ -419,7 +419,7 @@ ReactiveUtils.autoSave(state, 'key', { autoSave: true });
 
 // Method: Enable at runtime
 ReactiveUtils.autoSave(state, 'key', { autoSave: false });
-state.$startAutoSave(); // Enable when needed
+ReactiveUtils.startAutoSave(state); // Enable when needed
 ```
 
 ---
@@ -428,48 +428,48 @@ state.$startAutoSave(); // Enable when needed
 
 1. **Resume after batch operations**
    ```javascript
-   state.$stopAutoSave();
+   ReactiveUtils.stopAutoSave(state);
    batchUpdate();
-   state.$save();
-   state.$startAutoSave(); // Resume
+   ReactiveUtils.save(state);
+   ReactiveUtils.startAutoSave(state); // Resume
    ```
 
 2. **Enable based on user preference**
    ```javascript
    if (userSettings.autoSave) {
-     state.$startAutoSave();
+     ReactiveUtils.startAutoSave(state);
    }
    ```
 
 3. **Enable when online**
    ```javascript
    window.addEventListener('online', () => {
-     state.$save(); // Sync first
-     state.$startAutoSave(); // Then enable
+     ReactiveUtils.save(state); // Sync first
+     ReactiveUtils.startAutoSave(state); // Then enable
    });
    ```
 
 4. **Enable after validation**
    ```javascript
    if (isValid(state)) {
-     state.$startAutoSave();
+     ReactiveUtils.startAutoSave(state);
    }
    ```
 
 5. **Pair with $stopAutoSave()**
    ```javascript
-   state.$stopAutoSave();
+   ReactiveUtils.stopAutoSave(state);
    try {
      performOperation();
    } finally {
-     state.$startAutoSave();
+     ReactiveUtils.startAutoSave(state);
    }
    ```
 
 6. **Check state before enabling**
    ```javascript
-   if (!state.$storageInfo().autoSaveEnabled) {
-     state.$startAutoSave();
+   if (!ReactiveUtils.storageInfo(state).autoSaveEnabled) {
+     ReactiveUtils.startAutoSave(state);
    }
    ```
 
@@ -492,4 +492,4 @@ state.$startAutoSave(); // Enable when needed
 
 ## **Summary**
 
-`$startAutoSave()` is a method added to reactive state objects by `autoSave()` that enables or resumes automatic saving after it has been disabled. When called, it re-establishes the reactive effect that watches for state changes and triggers saves according to the configured debounce settings. The method is idempotent, meaning it's safe to call multiple times without side effects. Use `$startAutoSave()` to resume auto-save after batch operations, to enable auto-save based on user preferences, when transitioning from offline to online mode, after data validation, when exiting privacy mode, or when feature flags enable auto-save functionality. It pairs with `$stopAutoSave()` to provide dynamic control over automatic saving behavior at runtime, unlike the autoSave option which is set at initialization and cannot be changed. The method takes no parameters and returns void, immediately affecting the state's auto-save behavior for all subsequent changes.
+`startAutoSave(state)` is a method added to reactive state objects by `autoSave()` that enables or resumes automatic saving after it has been disabled. When called, it re-establishes the reactive effect that watches for state changes and triggers saves according to the configured debounce settings. The method is idempotent, meaning it's safe to call multiple times without side effects. Use `startAutoSave(state)` to resume auto-save after batch operations, to enable auto-save based on user preferences, when transitioning from offline to online mode, after data validation, when exiting privacy mode, or when feature flags enable auto-save functionality. It pairs with `$stopAutoSave()` to provide dynamic control over automatic saving behavior at runtime, unlike the autoSave option which is set at initialization and cannot be changed. The method takes no parameters and returns void, immediately affecting the state's auto-save behavior for all subsequent changes.

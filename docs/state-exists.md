@@ -1,4 +1,4 @@
-# `$exists()` - Check if State Exists in Storage
+# `exists(state)` - Check if State Exists in Storage
 
 **Quick Start (30 seconds)**
 ```javascript
@@ -9,9 +9,9 @@ const state = ReactiveUtils.reactive({
 ReactiveUtils.autoSave(state, 'myData');
 
 // Check if data exists in storage
-if (state.$exists()) {
+if (ReactiveUtils.exists(state)) {
   console.log('Data found in storage');
-  state.$load();
+  ReactiveUtils.load(state);
 } else {
   console.log('No saved data');
   initializeDefaults();
@@ -20,9 +20,9 @@ if (state.$exists()) {
 
 ---
 
-## **What is `$exists()`?**
+## **What is `exists(state)`?**
 
-`$exists()` is a **method added to reactive state objects** by `autoSave()` that checks if data exists in storage for the current state key.
+`exists(state)` is a **method added to reactive state objects** by `autoSave()` that checks if data exists in storage for the current state key.
 
 **Key characteristics:**
 - **Returns Boolean**: true if exists, false if not
@@ -36,11 +36,11 @@ if (state.$exists()) {
 ## **Syntax**
 
 ```javascript
-state.$exists()
+ReactiveUtils.exists(state)
 ```
 
 ### **Parameters**
-- None
+- **`state`** (Object): Storage-enabled reactive state object
 
 ### **Returns**
 - **Type**: `boolean`
@@ -96,8 +96,8 @@ const settings = ReactiveUtils.reactive({
 
 ReactiveUtils.autoSave(settings, 'settings');
 
-if (settings.$exists()) {
-  settings.$load();
+if (settings.exists(state)) {
+  settings.load(state);
   console.log('Settings loaded');
 } else {
   console.log('Using default settings');
@@ -113,8 +113,8 @@ const cache = ReactiveUtils.reactive({
 
 ReactiveUtils.autoSave(cache, 'cache');
 
-if (cache.$exists()) {
-  cache.$load();
+if (ReactiveUtils.exists(cache)) {
+  cache.load(state);
   console.log('Using cached data');
 } else {
   fetchFreshData().then(data => {
@@ -132,7 +132,7 @@ const userState = ReactiveUtils.reactive({
 
 ReactiveUtils.autoSave(userState, 'userState');
 
-if (!userState.$exists()) {
+if (!userState.exists(state)) {
   // First time user
   showWelcomeMessage();
   showTutorial();
@@ -148,8 +148,8 @@ const session = ReactiveUtils.reactive({
 
 ReactiveUtils.autoSave(session, 'session');
 
-if (session.$exists()) {
-  session.$load();
+if (session.exists(state)) {
+  session.load(state);
   console.log('Existing session found');
   validateSession(session.token);
 } else {
@@ -169,8 +169,8 @@ ReactiveUtils.autoSave(dataCache, 'products', {
 });
 
 function loadProducts() {
-  if (dataCache.$exists()) {
-    dataCache.$load();
+  if (dataCache.exists(state)) {
+    dataCache.load(state);
     console.log('Using cached products');
   } else {
     console.log('Cache expired or missing');
@@ -189,11 +189,11 @@ const draft = ReactiveUtils.reactive({
 ReactiveUtils.autoSave(draft, 'draft');
 
 window.addEventListener('load', () => {
-  if (draft.$exists()) {
+  if (draft.exists(state)) {
     if (confirm('Continue previous draft?')) {
-      draft.$load();
+      draft.load(state);
     } else {
-      draft.$clear();
+      draft.clear(state);
     }
   }
 });
@@ -205,7 +205,7 @@ function profileExists(username) {
   const profile = ReactiveUtils.reactive({});
   ReactiveUtils.autoSave(profile, `profile:${username}`);
 
-  return profile.$exists();
+  return profile.exists(state);
 }
 
 if (profileExists('john')) {
@@ -224,8 +224,8 @@ const state = ReactiveUtils.reactive({
 ReactiveUtils.autoSave(state, 'state');
 
 function saveIfNew() {
-  if (!state.$exists()) {
-    state.$save();
+  if (!ReactiveUtils.exists(state)) {
+    ReactiveUtils.save(state);
     console.log('Saved new state');
   } else {
     console.log('State already exists');
@@ -241,12 +241,12 @@ const newData = ReactiveUtils.reactive({});
 ReactiveUtils.autoSave(oldData, 'data:v1');
 ReactiveUtils.autoSave(newData, 'data:v2');
 
-if (oldData.$exists() && !newData.$exists()) {
+if (oldData.exists(state) && !newData.exists(state)) {
   console.log('Migrating data from v1 to v2');
-  oldData.$load();
+  oldData.load(state);
   migrateData(oldData, newData);
-  newData.$save();
-  oldData.$clear();
+  newData.save(state);
+  oldData.clear(state);
 }
 ```
 
@@ -260,8 +260,8 @@ ReactiveUtils.autoSave(state, 'state');
 
 function getStorageStatus() {
   return {
-    exists: state.$exists(),
-    info: state.$exists() ? state.$storageInfo() : null
+    exists: ReactiveUtils.exists(state),
+    info: ReactiveUtils.exists(state) ? ReactiveUtils.storageInfo(state) : null
   };
 }
 
@@ -274,21 +274,21 @@ console.log(getStorageStatus());
 
 ### **Pattern 1: Check and Load**
 ```javascript
-if (state.$exists()) {
-  state.$load();
+if (ReactiveUtils.exists(state)) {
+  ReactiveUtils.load(state);
 }
 ```
 
 ### **Pattern 2: Check and Initialize**
 ```javascript
-if (!state.$exists()) {
+if (!ReactiveUtils.exists(state)) {
   initializeDefaults();
 }
 ```
 
 ### **Pattern 3: Conditional Actions**
 ```javascript
-const exists = state.$exists();
+const exists = ReactiveUtils.exists(state);
 if (exists) {
   handleExisting();
 } else {
@@ -298,14 +298,14 @@ if (exists) {
 
 ### **Pattern 4: Check Before Clear**
 ```javascript
-if (state.$exists()) {
-  state.$clear();
+if (ReactiveUtils.exists(state)) {
+  ReactiveUtils.clear(state);
 }
 ```
 
 ### **Pattern 5: Existence Flag**
 ```javascript
-const hasData = state.$exists();
+const hasData = ReactiveUtils.exists(state);
 console.log(`Has data: ${hasData}`);
 ```
 
@@ -313,7 +313,7 @@ console.log(`Has data: ${hasData}`);
 
 ## **When to Use**
 
-| Scenario | Use $exists() |
+| Scenario | Use exists() |
 |----------|---------------|
 | Check before load | ✓ Yes |
 | Conditional initialization | ✓ Yes |
@@ -321,14 +321,14 @@ console.log(`Has data: ${hasData}`);
 | Cache validation | ✓ Yes |
 | Session check | ✓ Yes |
 | Data migration | ✓ Yes |
-| Loading data | ✗ No (use $load()) |
+| Loading data | ✗ No (use load(state)) |
 | Getting data | ✗ No (use storage.get()) |
 
 ---
 
-## **vs. $load()**
+## **vs. load(state)**
 
-| Feature | `$exists()` | `$load()` |
+| Feature | `exists(state)` | `load(state)` |
 |---------|------------|-----------|
 | Checks existence | ✓ Yes | Implicitly |
 | Loads data | ✗ No | ✓ Yes |
@@ -338,12 +338,12 @@ console.log(`Has data: ${hasData}`);
 
 ```javascript
 // Just check
-if (state.$exists()) {
+if (ReactiveUtils.exists(state)) {
   // Data exists
 }
 
 // Check and load
-if (state.$load()) {
+if (ReactiveUtils.load(state)) {
   // Data was loaded
 }
 ```
@@ -353,7 +353,7 @@ if (state.$load()) {
 ## **Return Value**
 
 ```javascript
-const exists = state.$exists();
+const exists = ReactiveUtils.exists(state);
 
 if (exists) {
   // Data exists in storage
@@ -370,8 +370,8 @@ if (exists) {
 
 1. **Check before loading**
    ```javascript
-   if (state.$exists()) {
-     state.$load();
+   if (ReactiveUtils.exists(state)) {
+     ReactiveUtils.load(state);
    } else {
      useDefaults();
    }
@@ -379,29 +379,29 @@ if (exists) {
 
 2. **Handle first-time users**
    ```javascript
-   if (!state.$exists()) {
+   if (!ReactiveUtils.exists(state)) {
      showOnboarding();
    }
    ```
 
 3. **Validate cache**
    ```javascript
-   if (!cache.$exists()) {
+   if (!ReactiveUtils.exists(cache)) {
      refreshCache();
    }
    ```
 
 4. **Combine with user choice**
    ```javascript
-   if (state.$exists() && confirm('Load saved data?')) {
-     state.$load();
+   if (ReactiveUtils.exists(state) && confirm('Load saved data?')) {
+     ReactiveUtils.load(state);
    }
    ```
 
 5. **Check expiration**
    ```javascript
-   // $exists() automatically checks expiration
-   if (cache.$exists()) {
+   // exists(state) automatically checks expiration
+   if (ReactiveUtils.exists(cache)) {
      // Cache is valid
    } else {
      // Cache expired or missing
@@ -410,7 +410,7 @@ if (exists) {
 
 6. **Use for migrations**
    ```javascript
-   if (oldVersion.$exists() && !newVersion.$exists()) {
+   if (oldVersion.exists(state) && !newVersion.exists(state)) {
      migrateData();
    }
    ```
@@ -434,4 +434,4 @@ if (exists) {
 
 ## **Summary**
 
-`$exists()` is a method added to reactive state objects by `autoSave()` that checks if data exists in storage for the current state key. When called, it returns true if data exists in storage and hasn't expired, or false if no data is found or if the data has expired. This is a non-destructive, read-only operation that doesn't modify the state object or storage. Use `$exists()` before loading data to avoid unnecessary load operations, to detect first-time users who don't have saved data, to validate cache before using it, to check for existing sessions, or to implement conditional initialization logic. It's perfect for user onboarding (showing tutorials to new users), cache validation (checking if cached data is available), session management (checking for active sessions), and data migration (detecting old versions that need upgrading). The method automatically handles expiration checking, so expired data is treated as non-existent.
+`exists(state)` is a method added to reactive state objects by `autoSave()` that checks if data exists in storage for the current state key. When called, it returns true if data exists in storage and hasn't expired, or false if no data is found or if the data has expired. This is a non-destructive, read-only operation that doesn't modify the state object or storage. Use `exists(state)` before loading data to avoid unnecessary load operations, to detect first-time users who don't have saved data, to validate cache before using it, to check for existing sessions, or to implement conditional initialization logic. It's perfect for user onboarding (showing tutorials to new users), cache validation (checking if cached data is available), session management (checking for active sessions), and data migration (detecting old versions that need upgrading). The method automatically handles expiration checking, so expired data is treated as non-existent.
