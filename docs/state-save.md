@@ -1,4 +1,4 @@
-# `$save()` - Force Save State to Storage
+# `save(state)` - Force Save State to Storage
 
 **Quick Start (30 seconds)**
 ```javascript
@@ -17,22 +17,22 @@ state.count = 42;
 state.name = 'My App';
 
 // Force immediate save
-state.$save();
+ReactiveUtils.save(state);
 console.log('Saved immediately!');
 ```
 
 ---
 
-## **What is `$save()`?**
+## **What is `save(state)`?**
 
-`$save()` is a **method added to reactive state objects** by `autoSave()` that forces an immediate save to storage, bypassing debounce delays and auto-save settings.
+`save()` is a **namespace method** that forces an immediate save of reactive state to storage, bypassing debounce delays and auto-save settings.
 
 **Key characteristics:**
 - **Immediate**: Saves immediately, no debounce delay
 - **Manual Control**: Explicit save operation
 - **Bypasses Auto-Save**: Works even if autoSave is disabled
 - **Respects Hooks**: Still runs onSave callback if configured
-- **Returns Void**: No return value
+- **Returns Boolean**: Returns true on success
 - **Synchronous**: Completes before continuing
 
 ---
@@ -40,45 +40,45 @@ console.log('Saved immediately!');
 ## **Syntax**
 
 ```javascript
-state.$save()
+ReactiveUtils.save(state)
 ```
 
 ### **Parameters**
-- None
+- **`state`** (Object): Storage-enabled reactive state object
 
 ### **Returns**
-- **Type**: `void`
+- **Type**: `boolean`
+- **`true`**: Successfully saved
+- **`false`**: Save failed or state doesn't have storage enabled
 
 ---
 
 ## **How it works**
 
 ```javascript
-// When autoSave() is called
-ReactiveUtils.autoSave(state, 'key', options);
-
-// This method is added to state:
-state.$save = function() {
-  let valueToSave = toRaw(state);
-
-  // Apply onSave transform if configured
-  if (options.onSave) {
-    valueToSave = options.onSave(valueToSave);
+// Namespace method implementation
+ReactiveUtils.save = function(state) {
+  if (!state || !state.$save) {
+    console.error('Invalid state or storage not enabled');
+    return false;
   }
-
-  // Save to storage immediately
-  store.set(key, valueToSave, { expires: options.expires });
-
-  // No debounce, no delay
+  return state.$save(); // Calls internal implementation
 };
+
+// Internal implementation
+// Gets raw copy of state
+// Applies onSave transformation if configured
+// Saves to storage immediately
+// Bypasses any debounce delay
 ```
 
 **What happens:**
-1. Gets raw (non-reactive) copy of state
-2. Applies onSave transformation if configured
-3. Saves to storage immediately
-4. Bypasses any debounce delay
-5. Returns immediately
+1. Validates state has storage enabled
+2. Gets raw (non-reactive) copy of state
+3. Applies onSave transformation if configured
+4. Saves to storage immediately
+5. Bypasses any debounce delay
+6. Returns success status
 
 ---
 
@@ -99,7 +99,7 @@ settings.theme = 'dark';
 settings.language = 'es';
 
 // Save when ready
-settings.$save();
+ReactiveUtils.save(settings);
 ```
 
 ### **Example 2: Save on Button Click**
@@ -114,7 +114,7 @@ ReactiveUtils.autoSave(formData, 'draft', {
 });
 
 document.getElementById('saveBtn').addEventListener('click', () => {
-  formData.$save();
+  ReactiveUtils.save(formData);
   showNotification('Draft saved!');
 });
 ```
@@ -132,7 +132,7 @@ ReactiveUtils.autoSave(editor, 'document', {
 
 window.addEventListener('beforeunload', (e) => {
   // Force save before leaving
-  editor.$save();
+  ReactiveUtils.save(editor);
 });
 ```
 
@@ -150,7 +150,7 @@ ReactiveUtils.autoSave(gameState, 'savegame', {
 
 // Save every 30 seconds
 setInterval(() => {
-  gameState.$save();
+  ReactiveUtils.save(gameState);
   console.log('Game auto-saved');
 }, 30000);
 ```
@@ -172,7 +172,7 @@ function loadData(data) {
   state.posts = data.posts;
 
   // Save once after all updates
-  state.$save();
+  ReactiveUtils.save(state);
 }
 ```
 
@@ -195,7 +195,7 @@ function updateConfig(updates) {
 
 function saveIfNeeded() {
   if (config.isDirty) {
-    config.$save();
+    ReactiveUtils.save(config);
     config.isDirty = false;
     console.log('Config saved');
   }
@@ -214,7 +214,7 @@ ReactiveUtils.autoSave(data, 'critical', {
 
 async function saveWithConfirm() {
   if (confirm('Save changes?')) {
-    data.$save();
+    ReactiveUtils.save(data);
     alert('Saved successfully!');
   }
 }
@@ -242,7 +242,7 @@ document.getElementById('form').addEventListener('submit', (e) => {
   }
 
   // Save before submitting
-  form.$save();
+  ReactiveUtils.save(form);
 
   // Submit
   submitForm(form);
@@ -264,7 +264,7 @@ ReactiveUtils.autoSave(state, 'data', {
 });
 
 function saveNow() {
-  state.$save();
+  ReactiveUtils.save(state);
   setTimeout(() => {
     document.querySelector('.save-indicator').textContent = '✓ Saved';
   }, 100);
@@ -285,7 +285,7 @@ ReactiveUtils.autoSave(editor, 'editor', {
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     // Force save when tab becomes hidden
-    editor.$save();
+    ReactiveUtils.save(editor);
     console.log('Saved on tab switch');
   }
 });
@@ -297,20 +297,20 @@ document.addEventListener('visibilitychange', () => {
 
 ### **Pattern 1: Immediate Save**
 ```javascript
-state.$save();
+ReactiveUtils.save(state);
 ```
 
 ### **Pattern 2: Save on Event**
 ```javascript
 button.addEventListener('click', () => {
-  state.$save();
+  ReactiveUtils.save(state);
 });
 ```
 
 ### **Pattern 3: Save Before Action**
 ```javascript
 function doSomething() {
-  state.$save();
+  ReactiveUtils.save(state);
   performAction();
 }
 ```
@@ -318,13 +318,13 @@ function doSomething() {
 ### **Pattern 4: Conditional Save**
 ```javascript
 if (state.isDirty) {
-  state.$save();
+  ReactiveUtils.save(state);
 }
 ```
 
 ### **Pattern 5: Save with Feedback**
 ```javascript
-state.$save();
+ReactiveUtils.save(state);
 showNotification('Saved!');
 ```
 
@@ -332,8 +332,8 @@ showNotification('Saved!');
 
 ## **When to Use**
 
-| Scenario | Use $save() |
-|----------|-------------|
+| Scenario | Use save() |
+|----------|------------|
 | Manual save control | ✓ Yes |
 | Save before navigation | ✓ Yes |
 | Save on button click | ✓ Yes |
@@ -346,7 +346,7 @@ showNotification('Saved!');
 
 ## **vs. Auto-Save**
 
-| Feature | `$save()` | Auto-Save |
+| Feature | `save()` | Auto-Save |
 |---------|----------|-----------|
 | Trigger | Manual | Automatic |
 | Timing | Immediate | Debounced |
@@ -361,7 +361,7 @@ state.value = 'new'; // Saves after 500ms
 // Manual save (explicit)
 ReactiveUtils.autoSave(state, 'key', { autoSave: false });
 state.value = 'new'; // Not saved
-state.$save(); // Saves immediately
+ReactiveUtils.save(state); // Saves immediately
 ```
 
 ---
@@ -370,14 +370,14 @@ state.$save(); // Saves immediately
 
 1. **Use before critical operations**
    ```javascript
-   state.$save();
+   ReactiveUtils.save(state);
    navigateAway();
    ```
 
 2. **Save before page unload**
    ```javascript
    window.addEventListener('beforeunload', () => {
-     state.$save();
+     ReactiveUtils.save(state);
    });
    ```
 
@@ -386,19 +386,19 @@ state.$save(); // Saves immediately
    state.a = 1;
    state.b = 2;
    state.c = 3;
-   state.$save(); // One save for all
+   ReactiveUtils.save(state); // One save for all
    ```
 
 4. **Provide user feedback**
    ```javascript
-   state.$save();
+   ReactiveUtils.save(state);
    showNotification('Saved successfully');
    ```
 
 5. **Combine with validation**
    ```javascript
    if (isValid(state)) {
-     state.$save();
+     ReactiveUtils.save(state);
    }
    ```
 
@@ -408,7 +408,7 @@ state.$save(); // Saves immediately
    ReactiveUtils.autoSave(draft, 'draft', { debounce: 2000 });
 
    // Manual save for final submit
-   finalData.$save();
+   ReactiveUtils.save(finalData);
    ```
 
 ---
@@ -420,7 +420,7 @@ state.$save(); // Saves immediately
 3. **Bypass Auto-Save**: Works even if auto-save disabled
 4. **Synchronous**: Completes immediately
 5. **Respects onSave**: Still runs onSave transformation
-6. **No Return**: Returns void
+6. **Returns Boolean**: Returns success status
 7. **Use for Control**: When you need explicit save timing
 8. **Critical Saves**: Use before important operations
 9. **User Triggered**: Perfect for save buttons
@@ -430,4 +430,4 @@ state.$save(); // Saves immediately
 
 ## **Summary**
 
-`$save()` is a method added to reactive state objects by `autoSave()` that forces an immediate save to storage, bypassing debounce delays and auto-save settings. When called, it immediately saves the current state to the configured storage (localStorage or sessionStorage), applying any onSave transformation if configured. The method is synchronous and returns immediately after saving. Use `$save()` when you need explicit control over save timing, such as before page navigation, on button clicks, after batch updates, or when auto-save is disabled. It's perfect for critical save operations where you can't wait for debounced auto-saves, form submissions where you want to ensure data is saved, or when implementing manual save buttons. The method works whether auto-save is enabled or disabled, making it suitable for hybrid approaches where most saves are automatic but some require immediate persistence.
+`save(state)` is a namespace method that forces an immediate save of reactive state to storage, bypassing debounce delays and auto-save settings. When called, it immediately saves the current state to the configured storage (localStorage or sessionStorage), applying any onSave transformation if configured. The method is synchronous and returns a boolean indicating success or failure. Use `save()` when you need explicit control over save timing, such as before page navigation, on button clicks, after batch updates, or when auto-save is disabled. It's perfect for critical save operations where you can't wait for debounced auto-saves, form submissions where you want to ensure data is saved, or when implementing manual save buttons. The method works whether auto-save is enabled or disabled, making it suitable for hybrid approaches where most saves are automatic but some require immediate persistence.

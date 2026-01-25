@@ -1,4 +1,4 @@
-# `$load()` - Load State from Storage
+# `load(state)` - Load State from Storage
 
 **Quick Start (30 seconds)**
 ```javascript
@@ -12,16 +12,18 @@ ReactiveUtils.autoSave(state, 'myState', {
 });
 
 // Load manually when needed
-state.$load();
+ReactiveUtils.load(state);
 console.log(state.count); // Loaded from storage
 console.log(state.name);  // Loaded from storage
 ```
 
 ---
 
-## **What is `$load()`?**
+## **What is `load(state)`?**
 
-`$load()` is a **method added to reactive state objects** by `autoSave()` that loads state from storage, overwriting the current state values.
+`load()` is a **namespace method**
+
+`load(state)` is a **method added to reactive state objects** by `autoSave()` that loads state from storage, overwriting the current state values.
 
 **Key characteristics:**
 - **Load from Storage**: Reads data from storage
@@ -36,7 +38,7 @@ console.log(state.name);  // Loaded from storage
 ## **Syntax**
 
 ```javascript
-state.$load()
+ReactiveUtils.load(state)
 ```
 
 ### **Parameters**
@@ -172,7 +174,7 @@ const state = ReactiveUtils.reactive({
 ReactiveUtils.autoSave(state, 'users');
 
 document.getElementById('refreshBtn').addEventListener('click', () => {
-  state.$load();
+  ReactiveUtils.load(state);
   showNotification('Data refreshed');
 });
 ```
@@ -246,7 +248,7 @@ ReactiveUtils.autoSave(state, 'config');
 
 function handleError() {
   console.log('Error occurred, reloading config');
-  if (!state.$load()) {
+  if (!ReactiveUtils.load(state)) {
     // Fallback to defaults
     state.config = getDefaultConfig();
   }
@@ -280,14 +282,14 @@ function loadDocument() {
 
 ### **Pattern 1: Load and Check**
 ```javascript
-if (state.$load()) {
+if (ReactiveUtils.load(state)) {
   console.log('Loaded successfully');
 }
 ```
 
 ### **Pattern 2: Load with Fallback**
 ```javascript
-if (!state.$load()) {
+if (!ReactiveUtils.load(state)) {
   // Use defaults
   state.value = defaultValue;
 }
@@ -296,21 +298,21 @@ if (!state.$load()) {
 ### **Pattern 3: Reload Data**
 ```javascript
 button.addEventListener('click', () => {
-  state.$load();
+  ReactiveUtils.load(state);
 });
 ```
 
 ### **Pattern 4: Conditional Load**
 ```javascript
 if (shouldLoad) {
-  state.$load();
+  ReactiveUtils.load(state);
 }
 ```
 
 ### **Pattern 5: Discard Changes**
 ```javascript
 function revert() {
-  state.$load(); // Reload from storage
+  ReactiveUtils.load(state); // Reload from storage
 }
 ```
 
@@ -332,7 +334,7 @@ function revert() {
 
 ## **vs. Auto-Load**
 
-| Feature | `$load()` | Auto-Load |
+| Feature | `load(state)` | Auto-Load |
 |---------|----------|-----------|
 | Trigger | Manual | Automatic |
 | Timing | On demand | On initialization |
@@ -346,7 +348,7 @@ ReactiveUtils.autoSave(state, 'key', { autoLoad: true });
 
 // Manual load (explicit)
 ReactiveUtils.autoSave(state, 'key', { autoLoad: false });
-state.$load(); // Load when needed
+ReactiveUtils.load(state); // Load when needed
 ```
 
 ---
@@ -354,7 +356,7 @@ state.$load(); // Load when needed
 ## **Return Value**
 
 ```javascript
-const loaded = state.$load();
+const loaded = ReactiveUtils.load(state);
 
 if (loaded) {
   // Data was found and loaded
@@ -371,7 +373,7 @@ if (loaded) {
 
 1. **Check return value**
    ```javascript
-   if (!state.$load()) {
+   if (!ReactiveUtils.load(state)) {
      // Handle missing data
      initializeDefaults();
    }
@@ -382,7 +384,7 @@ if (loaded) {
    if (hasChanges && !confirm('Discard changes?')) {
      return;
    }
-   state.$load();
+   ReactiveUtils.load(state);
    ```
 
 3. **Use with validation**
@@ -392,12 +394,12 @@ if (loaded) {
        return isValid(value) ? value : defaults;
      }
    });
-   state.$load();
+   ReactiveUtils.load(state);
    ```
 
 4. **Provide feedback**
    ```javascript
-   if (state.$load()) {
+   if (ReactiveUtils.load(state)) {
      showNotification('Loaded successfully');
    } else {
      showNotification('No saved data');
@@ -408,7 +410,7 @@ if (loaded) {
    ```javascript
    function getData() {
      if (!state.loaded) {
-       state.$load();
+       ReactiveUtils.load(state);
        state.loaded = true;
      }
      return state.data;
@@ -434,4 +436,4 @@ if (loaded) {
 
 ## **Summary**
 
-`$load()` is a method added to reactive state objects by `autoSave()` that loads state from storage, overwriting the current state values. When called, it attempts to read data from the configured storage (localStorage or sessionStorage), applies any onLoad transformation if configured, and overwrites the current state with the loaded values. The method returns true if data was successfully loaded, or false if no data was found or if the data had expired. Use `$load()` when you need explicit control over load timing, such as when auto-load is disabled, when you want to reload/refresh data from storage, when discarding local changes, or when implementing profile switching. It's perfect for implementing "revert changes" functionality, manual sync buttons, conditional loading based on user actions, or multi-profile systems where different data sets are loaded on demand. The return value makes it easy to implement fallback logic when no saved data exists.
+`load(state)` is a method added to reactive state objects by `autoSave()` that loads state from storage, overwriting the current state values. When called, it attempts to read data from the configured storage (localStorage or sessionStorage), applies any onLoad transformation if configured, and overwrites the current state with the loaded values. The method returns true if data was successfully loaded, or false if no data was found or if the data had expired. Use `load(state)` when you need explicit control over load timing, such as when auto-load is disabled, when you want to reload/refresh data from storage, when discarding local changes, or when implementing profile switching. It's perfect for implementing "revert changes" functionality, manual sync buttons, conditional loading based on user actions, or multi-profile systems where different data sets are loaded on demand. The return value makes it easy to implement fallback logic when no saved data exists.
