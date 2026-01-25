@@ -453,7 +453,7 @@ ReactiveUtils.autoSave(editor, 'document', {
 // Update online status
 window.addEventListener('online', () => {
   editor.isOnline = true;
-  editor.$save(); // Sync when back online
+  ReactiveUtils.save(editor); // Sync when back online
 });
 
 window.addEventListener('offline', () => {

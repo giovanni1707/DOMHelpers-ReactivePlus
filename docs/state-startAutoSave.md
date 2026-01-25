@@ -100,14 +100,14 @@ const data = ReactiveUtils.reactive({
 ReactiveUtils.autoSave(data, 'data');
 
 // Stop for batch updates
-data.$stopAutoSave();
+ReactiveUtils.stopAutoSave(data);
 
 data.items = [1, 2, 3];
 data.count = 3;
-data.$save();
+ReactiveUtils.save(data);
 
 // Resume auto-save
-data.$startAutoSave();
+ReactiveUtils.startAutoSave(data);
 
 // Future changes auto-save
 data.count = 4; // Auto-saved
@@ -125,7 +125,7 @@ ReactiveUtils.autoSave(settings, 'settings', {
 
 // User enables auto-save
 function enableAutoSave() {
-  settings.$startAutoSave();
+  ReactiveUtils.startAutoSave(settings);
   console.log('Auto-save enabled');
 }
 ```
@@ -171,9 +171,9 @@ ReactiveUtils.autoSave(editor, 'editor');
 
 function applyPreferences() {
   if (prefs.autoSave) {
-    editor.$startAutoSave();
+    ReactiveUtils.startAutoSave(editor);
   } else {
-    editor.$stopAutoSave();
+    ReactiveUtils.stopAutoSave(editor);
   }
 }
 
@@ -219,10 +219,10 @@ function updateMode(mode) {
   app.mode = mode;
 
   if (mode === 'production') {
-    app.$startAutoSave();
+    ReactiveUtils.startAutoSave(app);
     console.log('Production mode: auto-save enabled');
   } else {
-    app.$stopAutoSave();
+    ReactiveUtils.stopAutoSave(app);
     console.log('Development mode: auto-save disabled');
   }
 }
@@ -258,7 +258,7 @@ ReactiveUtils.autoSave(browsing, 'history');
 
 function exitPrivateMode() {
   browsing.privateMode = false;
-  browsing.$startAutoSave();
+  ReactiveUtils.startAutoSave(browsing);
 
   console.log('Exited private mode');
   console.log('History will now be saved');
@@ -266,7 +266,7 @@ function exitPrivateMode() {
 
 function enterPrivateMode() {
   browsing.privateMode = true;
-  browsing.$stopAutoSave();
+  ReactiveUtils.stopAutoSave(browsing);
 
   console.log('Entered private mode');
   console.log('History will not be saved');
@@ -288,7 +288,7 @@ async function validateAndEnable() {
   const valid = await validateForm(form);
 
   if (valid) {
-    form.$startAutoSave();
+    ReactiveUtils.startAutoSave(form);
     console.log('Form valid, auto-save enabled');
   } else {
     console.error('Form invalid, auto-save not enabled');
@@ -312,10 +312,10 @@ ReactiveUtils.autoSave(appState, 'appState');
 
 function checkFeatureFlags() {
   if (config.features.autoSave) {
-    appState.$startAutoSave();
+    ReactiveUtils.startAutoSave(appState);
     console.log('Auto-save feature enabled');
   } else {
-    appState.$stopAutoSave();
+    ReactiveUtils.stopAutoSave(appState);
     console.log('Auto-save feature disabled');
   }
 }
@@ -369,7 +369,7 @@ function setAutoSave(enabled) {
 
 ## **When to Use**
 
-| Scenario | Use $startAutoSave() |
+| Scenario | Use startAutoSave() |
 |----------|---------------------|
 | Resume after stop | ✓ Yes |
 | Enable on demand | ✓ Yes |
@@ -456,7 +456,7 @@ ReactiveUtils.startAutoSave(state); // Enable when needed
    }
    ```
 
-5. **Pair with $stopAutoSave()**
+5. **Pair with stopAutoSave()**
    ```javascript
    ReactiveUtils.stopAutoSave(state);
    try {
@@ -486,10 +486,10 @@ ReactiveUtils.startAutoSave(state); // Enable when needed
 7. **Dynamic**: Can toggle at runtime
 8. **No Parameters**: Takes no arguments
 9. **Returns Void**: No return value
-10. **Pairs with Stop**: Use with $stopAutoSave() for control
+10. **Pairs with Stop**: Use with stopAutoSave() for control
 
 ---
 
 ## **Summary**
 
-`startAutoSave(state)` is a method added to reactive state objects by `autoSave()` that enables or resumes automatic saving after it has been disabled. When called, it re-establishes the reactive effect that watches for state changes and triggers saves according to the configured debounce settings. The method is idempotent, meaning it's safe to call multiple times without side effects. Use `startAutoSave(state)` to resume auto-save after batch operations, to enable auto-save based on user preferences, when transitioning from offline to online mode, after data validation, when exiting privacy mode, or when feature flags enable auto-save functionality. It pairs with `$stopAutoSave()` to provide dynamic control over automatic saving behavior at runtime, unlike the autoSave option which is set at initialization and cannot be changed. The method takes no parameters and returns void, immediately affecting the state's auto-save behavior for all subsequent changes.
+`startAutoSave(state)` is a method added to reactive state objects by `autoSave()` that enables or resumes automatic saving after it has been disabled. When called, it re-establishes the reactive effect that watches for state changes and triggers saves according to the configured debounce settings. The method is idempotent, meaning it's safe to call multiple times without side effects. Use `startAutoSave(state)` to resume auto-save after batch operations, to enable auto-save based on user preferences, when transitioning from offline to online mode, after data validation, when exiting privacy mode, or when feature flags enable auto-save functionality. It pairs with `stopAutoSave()` to provide dynamic control over automatic saving behavior at runtime, unlike the autoSave option which is set at initialization and cannot be changed. The method takes no parameters and returns void, immediately affecting the state's auto-save behavior for all subsequent changes.

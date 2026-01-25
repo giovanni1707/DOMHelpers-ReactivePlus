@@ -62,7 +62,7 @@ ReactiveUtils.save = function(state) {
     console.error('Invalid state or storage not enabled');
     return false;
   }
-  return state.$save(); // Calls internal implementation
+  return ReactiveUtils.save(state); // Calls internal implementation
 };
 
 // Internal implementation

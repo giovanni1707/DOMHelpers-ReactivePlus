@@ -158,9 +158,9 @@ ReactiveUtils.autoSave(states.prefs, 'prefs');
 ReactiveUtils.autoSave(states.cache, 'cache');
 
 function getTotalStorageUsage() {
-  const userInfo = states.user.$storageInfo();
-  const prefsInfo = states.prefs.$storageInfo();
-  const cacheInfo = states.cache.$storageInfo();
+  const userInfo = states.ReactiveUtils.storageInfo(user);
+  const prefsInfo = states.ReactiveUtils.storageInfo(prefs);
+  const cacheInfo = states.ReactiveUtils.storageInfo(cache);
 
   const total = userInfo.size + prefsInfo.size + cacheInfo.size;
 
@@ -175,7 +175,7 @@ const editor = ReactiveUtils.reactive({ content: '' });
 ReactiveUtils.autoSave(editor, 'document');
 
 function updateStatusIndicator() {
-  const info = editor.$storageInfo();
+  const info = ReactiveUtils.storageInfo(editor);
 
   const indicator = document.getElementById('autoSaveStatus');
   indicator.textContent = info.autoSaveEnabled
@@ -235,11 +235,11 @@ const cache = ReactiveUtils.reactive({ data: [] });
 ReactiveUtils.autoSave(cache, 'cache');
 
 function clearIfLarge() {
-  const info = cache.$storageInfo();
+  const info = ReactiveUtils.storageInfo(cache);
 
   if (info.size > 100000) { // Over 100KB
     console.log(`Cache is ${info.size} bytes, clearing...`);
-    cache.$clear();
+    ReactiveUtils.clear(cache);
   }
 }
 ```
@@ -247,8 +247,8 @@ function clearIfLarge() {
 ### **Example 8: Compare Storage Keys**
 ```javascript
 function compareStorage(state1, state2) {
-  const info1 = state1.$storageInfo();
-  const info2 = state2.$storageInfo();
+  const info1 = ReactiveUtils.storageInfo(state1);
+  const info2 = ReactiveUtils.storageInfo(state2);
 
   console.log('State 1:', info1.fullKey, `(${info1.size} bytes)`);
   console.log('State 2:', info2.fullKey, `(${info2.size} bytes)`);
@@ -269,7 +269,7 @@ const settings = ReactiveUtils.reactive({
 ReactiveUtils.autoSave(settings, 'settings');
 
 function renderSettingsInfo() {
-  const info = settings.$storageInfo();
+  const info = ReactiveUtils.storageInfo(settings);
 
   const html = `
     <div class="storage-info">
@@ -466,7 +466,7 @@ console.log(`Save delay: ${info.debounce}ms`);
 
 5. **Create admin panels**
    ```javascript
-   const allInfo = states.map(s => s.$storageInfo());
+   const allInfo = states.map(s => ReactiveUtils.storageInfo(s));
    renderAdminPanel(allInfo);
    ```
 
