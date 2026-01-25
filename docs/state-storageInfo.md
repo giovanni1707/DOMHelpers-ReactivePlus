@@ -158,9 +158,9 @@ ReactiveUtils.autoSave(states.prefs, 'prefs');
 ReactiveUtils.autoSave(states.cache, 'cache');
 
 function getTotalStorageUsage() {
-  const userInfo = states.ReactiveUtils.storageInfo(user);
-  const prefsInfo = states.ReactiveUtils.storageInfo(prefs);
-  const cacheInfo = states.ReactiveUtils.storageInfo(cache);
+  const userInfo = ReactiveUtils.storageInfo(states.user);
+  const prefsInfo = ReactiveUtils.storageInfo(states.prefs);
+  const cacheInfo = ReactiveUtils.storageInfo(states.cache);
 
   const total = userInfo.size + prefsInfo.size + cacheInfo.size;
 

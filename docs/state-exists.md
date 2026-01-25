@@ -96,8 +96,8 @@ const settings = ReactiveUtils.reactive({
 
 ReactiveUtils.autoSave(settings, 'settings');
 
-if (settings.exists(state)) {
-  settings.load(state);
+if (ReactiveUtils.exists(settings)) {
+  ReactiveUtils.load(settings);
   console.log('Settings loaded');
 } else {
   console.log('Using default settings');
@@ -114,7 +114,7 @@ const cache = ReactiveUtils.reactive({
 ReactiveUtils.autoSave(cache, 'cache');
 
 if (ReactiveUtils.exists(cache)) {
-  cache.load(state);
+  ReactiveUtils.load(cache);
   console.log('Using cached data');
 } else {
   fetchFreshData().then(data => {
@@ -132,7 +132,7 @@ const userState = ReactiveUtils.reactive({
 
 ReactiveUtils.autoSave(userState, 'userState');
 
-if (!userState.exists(state)) {
+if (!ReactiveUtils.exists(userState)) {
   // First time user
   showWelcomeMessage();
   showTutorial();
@@ -148,8 +148,8 @@ const session = ReactiveUtils.reactive({
 
 ReactiveUtils.autoSave(session, 'session');
 
-if (session.exists(state)) {
-  session.load(state);
+if (ReactiveUtils.exists(session)) {
+  ReactiveUtils.load(session);
   console.log('Existing session found');
   validateSession(session.token);
 } else {
@@ -169,8 +169,8 @@ ReactiveUtils.autoSave(dataCache, 'products', {
 });
 
 function loadProducts() {
-  if (dataCache.exists(state)) {
-    dataCache.load(state);
+  if (ReactiveUtils.exists(dataCache)) {
+    ReactiveUtils.load(dataCache);
     console.log('Using cached products');
   } else {
     console.log('Cache expired or missing');
@@ -189,11 +189,11 @@ const draft = ReactiveUtils.reactive({
 ReactiveUtils.autoSave(draft, 'draft');
 
 window.addEventListener('load', () => {
-  if (draft.exists(state)) {
+  if (ReactiveUtils.exists(draft)) {
     if (confirm('Continue previous draft?')) {
-      draft.load(state);
+      ReactiveUtils.load(draft);
     } else {
-      draft.clear(state);
+      ReactiveUtils.clear(draft);
     }
   }
 });
@@ -205,7 +205,7 @@ function profileExists(username) {
   const profile = ReactiveUtils.reactive({});
   ReactiveUtils.autoSave(profile, `profile:${username}`);
 
-  return profile.exists(state);
+  return ReactiveUtils.exists(profile);
 }
 
 if (profileExists('john')) {
@@ -241,12 +241,12 @@ const newData = ReactiveUtils.reactive({});
 ReactiveUtils.autoSave(oldData, 'data:v1');
 ReactiveUtils.autoSave(newData, 'data:v2');
 
-if (oldData.exists(state) && !newData.exists(state)) {
+if (ReactiveUtils.exists(oldData) && !ReactiveUtils.exists(newData)) {
   console.log('Migrating data from v1 to v2');
-  oldData.load(state);
+  ReactiveUtils.load(oldData);
   migrateData(oldData, newData);
-  newData.save(state);
-  oldData.clear(state);
+  ReactiveUtils.save(newData);
+  ReactiveUtils.clear(oldData);
 }
 ```
 
@@ -410,7 +410,7 @@ if (exists) {
 
 6. **Use for migrations**
    ```javascript
-   if (oldVersion.exists(state) && !newVersion.exists(state)) {
+   if (ReactiveUtils.exists(oldVersion) && !ReactiveUtils.exists(newVersion)) {
      migrateData();
    }
    ```

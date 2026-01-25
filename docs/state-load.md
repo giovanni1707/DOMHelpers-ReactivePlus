@@ -98,7 +98,7 @@ ReactiveUtils.autoSave(settings, 'settings', {
 });
 
 // Load when needed
-if (settings.load(state)) {
+if (ReactiveUtils.load(settings)) {
   console.log('Settings loaded');
 } else {
   console.log('No saved settings');
@@ -118,7 +118,7 @@ data.items = [1, 2, 3];
 
 // Discard changes and reload
 function revertChanges() {
-  if (data.load(state)) {
+  if (ReactiveUtils.load(data)) {
     console.log('Changes reverted');
   }
 }
@@ -136,7 +136,7 @@ ReactiveUtils.autoSave(config, 'config', {
 });
 
 // Try to load, use defaults if not found
-if (!config.load(state)) {
+if (!ReactiveUtils.load(config)) {
   console.log('Using default configuration');
 }
 ```
@@ -154,7 +154,7 @@ ReactiveUtils.autoSave(cache, 'cache', {
 
 function loadIfNeeded() {
   if (shouldUseCache()) {
-    if (cache.load(state)) {
+    if (ReactiveUtils.load(cache)) {
       console.log('Using cached data');
       return true;
     }
@@ -192,7 +192,7 @@ function switchProfile(profileName) {
     autoLoad: false
   });
 
-  if (profile.load(state)) {
+  if (ReactiveUtils.load(profile)) {
     console.log(`Loaded profile: ${profileName}`);
   } else {
     console.log(`No profile found: ${profileName}`);
@@ -212,7 +212,7 @@ ReactiveUtils.autoSave(sharedState, 'messages');
 
 // Sync from another tab's changes
 document.getElementById('syncBtn').addEventListener('click', () => {
-  if (sharedState.load(state)) {
+  if (ReactiveUtils.load(sharedState)) {
     console.log('Synced with latest data');
   }
 });
@@ -235,7 +235,7 @@ ReactiveUtils.autoSave(data, 'data', {
   }
 });
 
-data.load(state); // Will validate and use defaults if invalid
+ReactiveUtils.load(data); // Will validate and use defaults if invalid
 ```
 
 ### **Example 9: Reload on Error**
@@ -267,11 +267,11 @@ ReactiveUtils.autoSave(editor, 'document');
 function loadDocument() {
   if (editor.hasUnsavedChanges) {
     if (confirm('Discard unsaved changes?')) {
-      editor.load(state);
+      ReactiveUtils.load(editor);
       editor.hasUnsavedChanges = false;
     }
   } else {
-    editor.load(state);
+    ReactiveUtils.load(editor);
   }
 }
 ```

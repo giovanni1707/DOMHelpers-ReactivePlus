@@ -101,7 +101,7 @@ const cache = ReactiveUtils.reactive({
 ReactiveUtils.autoSave(cache, 'cache');
 
 function clearCache() {
-  cache.clear(state);
+  ReactiveUtils.clear(cache);
   cache.data = [];
   cache.timestamp = Date.now();
   console.log('Cache cleared');
@@ -120,7 +120,7 @@ ReactiveUtils.autoSave(settings, 'settings');
 
 function resetSettings() {
   // Clear stored settings
-  settings.clear(state);
+  ReactiveUtils.clear(settings);
 
   // Reset to defaults
   settings.theme = 'light';
@@ -128,7 +128,7 @@ function resetSettings() {
   settings.notifications = false;
 
   // Save new defaults
-  settings.save(state);
+  ReactiveUtils.save(settings);
 }
 ```
 
@@ -142,7 +142,7 @@ ReactiveUtils.autoSave(data, 'data', {
   onLoad: (value) => {
     if (!isValid(value)) {
       // Clear corrupted data
-      data.clear(state);
+      ReactiveUtils.clear(data);
       return getDefaults();
     }
     return value;
@@ -180,7 +180,7 @@ function publishAndClear() {
   publishPost(draft);
 
   // Clear draft after publishing
-  draft.clear(state);
+  ReactiveUtils.clear(draft);
   draft.title = '';
   draft.content = '';
 
@@ -199,9 +199,9 @@ ReactiveUtils.autoSave(prefs, 'prefs');
 ReactiveUtils.autoSave(cache, 'cache');
 
 function clearAll() {
-  user.clear(state);
-  prefs.clear(state);
-  cache.clear(state);
+  ReactiveUtils.clear(user);
+  ReactiveUtils.clear(prefs);
+  ReactiveUtils.clear(cache);
   console.log('All storage cleared');
 }
 ```
@@ -232,7 +232,7 @@ const browsing = ReactiveUtils.reactive({
 ReactiveUtils.autoSave(browsing, 'browsing');
 
 function enablePrivacyMode() {
-  browsing.clear(state);
+  ReactiveUtils.clear(browsing);
   browsing.history = [];
   browsing.bookmarks = [];
   console.log('Privacy mode enabled');
@@ -251,7 +251,7 @@ ReactiveUtils.autoSave(cache, 'cache');
 function checkExpiration() {
   if (cache.expiresAt && Date.now() > cache.expiresAt) {
     console.log('Data expired, clearing');
-    cache.clear(state);
+    ReactiveUtils.clear(cache);
     cache.value = null;
     cache.expiresAt = null;
   }
@@ -385,7 +385,7 @@ const loaded = ReactiveUtils.load(state); // Returns false
 5. **Clear on privacy actions**
    ```javascript
    function clearHistory() {
-     history.clear(state);
+     ReactiveUtils.clear(history);
      history.items = [];
    }
    ```
@@ -394,7 +394,7 @@ const loaded = ReactiveUtils.load(state); // Returns false
    ```javascript
    // Clears saved preferences
    // User will see defaults on next visit
-   prefs.clear(state);
+   ReactiveUtils.clear(prefs);
    ```
 
 ---
