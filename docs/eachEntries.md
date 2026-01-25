@@ -108,7 +108,7 @@ function eachEntries(obj, callback, selector) {
 
   // 4. Render to DOM if selector provided
   if (selector && typeof selector === 'string') {
-    const element = document.querySelector(selector);
+    const element = querySelector(selector);
     if (element) {
       element.innerHTML = output || '';
     }
@@ -164,7 +164,7 @@ console.log(html);
 // "<li>name: Laptop</li><li>price: 999</li><li>stock: 5</li>"
 
 // Wrap in ul
-document.getElementById('product').innerHTML = `<ul>${html}</ul>`;
+querySelector('#product').innerHTML = `<ul>${html}</ul>`;
 ```
 
 ### **Example 3: Render to DOM**
@@ -246,7 +246,7 @@ const rows = eachEntries(stats, (key, value, index) => {
   `;
 });
 
-document.getElementById('statsTable').innerHTML = `
+querySelector('#statsTable').innerHTML = `
   <table>
     <thead>
       <tr><th>Metric</th><th>Count</th></tr>
@@ -418,7 +418,7 @@ let html = '';
 Object.entries(obj).forEach(([key, value]) => {
   html += `<div>${key}: ${value}</div>`;
 });
-document.querySelector('#output').innerHTML = html;
+querySelector('#output').innerHTML = html;
 ```
 
 ---

@@ -119,10 +119,10 @@ storage.set('notification', 'You have a new message');
 ReactiveUtils.effect(() => {
   const notification = storage.get('notification');
   if (notification) {
-    document.getElementById('notification').textContent = notification;
-    document.getElementById('notification').style.display = 'block';
+    querySelector('#notification').textContent = notification;
+    querySelector('#notification').style.display = 'block';
   } else {
-    document.getElementById('notification').style.display = 'none';
+    querySelector('#notification').style.display = 'none';
   }
 });
 
@@ -149,7 +149,7 @@ function clearCache() {
 }
 
 // Clear button
-document.getElementById('clearCacheBtn').addEventListener('click', clearCache);
+querySelector('#clearCacheBtn').addEventListener('click', clearCache);
 ```
 
 ### **Example 4: Remove After Use**
@@ -208,7 +208,7 @@ cart.set('items', []);
 // Reactive cart display
 ReactiveUtils.effect(() => {
   const items = cart.get('items') || [];
-  document.getElementById('cartCount').textContent = items.length;
+  querySelector('#cartCount').textContent = items.length;
 
   const html = items.map(item => `
     <div class="cart-item">
@@ -216,7 +216,7 @@ ReactiveUtils.effect(() => {
       <button onclick="removeFromCart('${item.id}')">Remove</button>
     </div>
   `).join('');
-  document.getElementById('cartItems').innerHTML = html;
+  querySelector('#cartItems').innerHTML = html;
 });
 
 // Remove specific item
@@ -326,7 +326,7 @@ function enablePrivacyMode() {
 // Reactive privacy indicator
 ReactiveUtils.effect(() => {
   const hasHistory = history.has('visited');
-  document.getElementById('privacyMode').textContent =
+  querySelector('#privacyMode').textContent =
     hasHistory ? 'Normal Mode' : 'Privacy Mode';
 });
 ```

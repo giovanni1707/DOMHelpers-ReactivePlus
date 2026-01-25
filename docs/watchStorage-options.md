@@ -516,9 +516,9 @@ console.log('Initial theme:', app.theme);
 ReactiveUtils.watchStorage('formDraft', (draft) => {
   if (draft) {
     // Restore form fields
-    document.getElementById('title').value = draft.title || '';
-    document.getElementById('content').value = draft.content || '';
-    document.getElementById('category').value = draft.category || '';
+    querySelector('#title').value = draft.title || '';
+    querySelector('#content').value = draft.content || '';
+    querySelector('#category').value = draft.category || '';
 
     console.log('Form draft restored');
   }

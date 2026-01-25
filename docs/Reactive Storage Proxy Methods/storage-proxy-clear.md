@@ -130,22 +130,22 @@ ReactiveUtils.effect(() => {
   const keys = cache.keys();
 
   if (keys.length === 0) {
-    document.getElementById('cacheStatus').textContent = 'Cache is empty';
-    document.getElementById('cacheList').innerHTML = '';
+    querySelector('#cacheStatus').textContent = 'Cache is empty';
+    querySelector('#cacheList').innerHTML = '';
   } else {
-    document.getElementById('cacheStatus').textContent =
+    querySelector('#cacheStatus').textContent =
       `Cache has ${keys.length} items`;
 
     const html = keys.map(key => {
       const value = cache.get(key);
       return `<li>${key}: ${JSON.stringify(value)}</li>`;
     }).join('');
-    document.getElementById('cacheList').innerHTML = html;
+    querySelector('#cacheList').innerHTML = html;
   }
 });
 
 // Clear cache button
-document.getElementById('clearCacheBtn').addEventListener('click', () => {
+querySelector('#clearCacheBtn').addEventListener('click', () => {
   cache.clear();
   showNotification('Cache cleared');
   // Effect runs, UI updates to show empty state
@@ -206,7 +206,7 @@ function resetSettings() {
   console.log('Settings reset to defaults');
 }
 
-document.getElementById('resetBtn').addEventListener('click', resetSettings);
+querySelector('#resetBtn').addEventListener('click', resetSettings);
 ```
 
 ### **Example 5: Privacy Mode**
@@ -226,7 +226,7 @@ function disablePrivacyMode() {
 // Reactive privacy indicator
 ReactiveUtils.effect(() => {
   const hasData = browsing.keys().length > 0;
-  document.getElementById('privacyMode').textContent =
+  querySelector('#privacyMode').textContent =
     hasData ? 'Normal Mode' : 'Privacy Mode Active';
 });
 ```
@@ -318,7 +318,7 @@ function clearAllData() {
   }
 }
 
-document.getElementById('clearAllBtn').addEventListener('click', clearAllData);
+querySelector('#clearAllBtn').addEventListener('click', clearAllData);
 ```
 
 ### **Example 10: Periodic Cache Clear**

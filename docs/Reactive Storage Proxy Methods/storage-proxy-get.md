@@ -207,11 +207,11 @@ storage.set('clicks', 0);
 // Display counter reactively
 ReactiveUtils.effect(() => {
   const clicks = storage.get('clicks');
-  document.getElementById('counter').textContent = `Clicks: ${clicks}`;
+  querySelector('#counter').textContent = `Clicks: ${clicks}`;
 });
 
 // Increment on click
-document.getElementById('btn').addEventListener('click', () => {
+querySelector('#btn').addEventListener('click', () => {
   const current = storage.get('clicks');
   storage.set('clicks', current + 1);
   // Effect runs automatically, display updates
@@ -255,8 +255,8 @@ ReactiveUtils.effect(() => {
   const items = cart.get('items');
   const total = items.reduce((sum, item) => sum + item.price, 0);
 
-  document.getElementById('cartCount').textContent = items.length;
-  document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`;
+  querySelector('#cartCount').textContent = items.length;
+  querySelector('#cartTotal').textContent = `$${total.toFixed(2)}`;
 
   const html = items.map(item => `
     <div class="cart-item">
@@ -264,7 +264,7 @@ ReactiveUtils.effect(() => {
       <span>$${item.price}</span>
     </div>
   `).join('');
-  document.getElementById('cartItems').innerHTML = html;
+  querySelector('#cartItems').innerHTML = html;
 });
 
 // Add item - display updates automatically
@@ -290,7 +290,7 @@ ReactiveUtils.effect(() => {
       <small>${new Date(msg.timestamp).toLocaleTimeString()}</small>
     </div>
   `).join('');
-  document.getElementById('messages').innerHTML = html;
+  querySelector('#messages').innerHTML = html;
 });
 
 // Tab 2: Send message
@@ -318,7 +318,7 @@ window.addEventListener('load', () => {
   if (draft) {
     // Restore form fields
     Object.entries(draft).forEach(([name, value]) => {
-      const field = document.querySelector(`[name="${name}"]`);
+      const field = querySelector(`[name="${name}"]`);
       if (field) field.value = value;
     });
 
@@ -327,10 +327,10 @@ window.addEventListener('load', () => {
 });
 
 // Auto-save on input
-document.querySelectorAll('input, textarea').forEach(field => {
+querySelectorAll('input, textarea').forEach(field => {
   field.addEventListener('input', () => {
     const form = {};
-    document.querySelectorAll('input, textarea').forEach(f => {
+    querySelectorAll('input, textarea').forEach(f => {
       form[f.name] = f.value;
     });
     formData.set('draft', form);
@@ -559,3 +559,113 @@ const user = userStr ? JSON.parse(userStr) : null;
 ## **Summary**
 
 `proxy.get(key)` is a method on the reactive storage proxy returned by `reactiveStorage()` that retrieves a value from browser storage and tracks the access as a reactive dependency, causing effects and computed properties to automatically re-run when the stored value changes. When called, it constructs the namespaced storage key, retrieves the item from localStorage or sessionStorage, automatically parses the JSON, checks if the data has expired, and returns the value or null if not found or expired. The key feature is that when used inside an effect or computed property, get() creates a reactive dependency, so the effect automatically re-runs whenever that storage key is updated via set(). This makes it perfect for reactive UI updates, user preferences, cached data, cross-tab synchronization, and any scenario where UI components need to automatically reflect storage changes. Unlike native localStorage.getItem(), proxy.get() provides automatic JSON deserialization, expiration handling, namespace management, and most importantly, reactive dependency tracking that keeps your application state synchronized with storage.
+
+---
+
+## **Advanced: Reactive UI with Global Shortcuts**
+
+Combining `proxy.get()` with global shortcuts creates powerful reactive patterns.
+
+### **Example: Auto-Sync UI with ClassName**
+```javascript
+const prefs = ReactiveUtils.reactiveStorage('localStorage', 'prefs');
+
+// Initialize preferences
+prefs.set('darkMode', true);
+prefs.set('compactView', false);
+prefs.set('showSidebar', true);
+
+// Reactive UI sync - runs on any preference change
+ReactiveUtils.effect(() => {
+  const darkMode = prefs.get('darkMode');
+  const compactView = prefs.get('compactView');
+  const showSidebar = prefs.get('showSidebar');
+
+  // Update all layout containers
+  ClassName('layout-container').updateAll(el => {
+    el.classList.toggle('dark-mode', darkMode);
+    el.classList.toggle('compact', compactView);
+    el.classList.toggle('sidebar-visible', showSidebar);
+  });
+
+  // Update all preference displays
+  ClassName('pref-display').updateAll(el => {
+    const pref = el.dataset.pref;
+    el.textContent = prefs.get(pref);
+  });
+});
+
+// Toggle preference - entire UI updates automatically
+prefs.set('darkMode', !prefs.get('darkMode'));
+```
+
+### **Example: Form Field Sync with Name**
+```javascript
+const userData = ReactiveUtils.reactiveStorage('localStorage', 'user');
+
+// Load user data
+userData.set('profile', {
+  username: 'alice',
+  email: 'alice@example.com',
+  bio: 'Software developer'
+});
+
+// Sync all form fields reactively
+ReactiveUtils.effect(() => {
+  const profile = userData.get('profile');
+  if (!profile) return;
+
+  // Populate all fields by name
+  Object.entries(profile).forEach(([fieldName, value]) => {
+    Name(fieldName).updateAll(field => {
+      field.value = value;
+    });
+  });
+});
+
+// Update profile - all fields update across all forms
+const profile = userData.get('profile');
+profile.username = 'alice_updated';
+userData.set('profile', profile);
+```
+
+### **Example: Multi-Tab Reactive Updates**
+```javascript
+const notifications = ReactiveUtils.reactiveStorage('localStorage', 'notifications');
+
+// Effect runs in ALL open tabs
+ReactiveUtils.effect(() => {
+  const unread = notifications.get('unread') || [];
+  const count = unread.length;
+
+  // Update all notification badges
+  ClassName('notification-badge').updateAll(badge => {
+    badge.textContent = count;
+    badge.style.display = count > 0 ? 'inline-block' : 'none';
+    badge.classList.toggle('has-notifications', count > 0);
+  });
+
+  // Update all notification lists
+  ClassName('notification-list').updateAll(list => {
+    list.innerHTML = unread.map(notif => `
+      <li class="notification-item">
+        <strong>${notif.title}</strong>
+        <p>${notif.message}</p>
+      </li>
+    `).join('');
+  });
+});
+
+// Add notification in Tab 1
+const unread = notifications.get('unread') || [];
+unread.push({ title: 'New Message', message: 'You have mail!' });
+notifications.set('unread', unread);
+// Tab 2 UI updates automatically!
+```
+
+**Why this is powerful:**
+- Cross-tab reactivity built-in
+- `ClassName()` updates all badges in all tabs
+- Single source of truth (storage)
+- No manual polling or postMessage needed
+

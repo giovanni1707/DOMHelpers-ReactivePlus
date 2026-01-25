@@ -165,11 +165,11 @@ if (!storage.has('clicks')) {
 // Reactive display
 ReactiveUtils.effect(() => {
   const clicks = storage.get('clicks');
-  document.getElementById('counter').textContent = clicks;
+  querySelector('#counter').textContent = clicks;
 });
 
 // Increment counter
-document.getElementById('btn').addEventListener('click', () => {
+querySelector('#btn').addEventListener('click', () => {
   const current = storage.get('clicks') || 0;
   storage.set('clicks', current + 1);
 });
@@ -198,8 +198,8 @@ ReactiveUtils.effect(() => {
   const items = cart.get('items') || [];
   const total = cart.get('total') || 0;
 
-  document.getElementById('cartCount').textContent = items.length;
-  document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`;
+  querySelector('#cartCount').textContent = items.length;
+  querySelector('#cartTotal').textContent = `$${total.toFixed(2)}`;
 });
 
 // Add items
@@ -249,10 +249,10 @@ function updateFontSize(size) {
 const formData = ReactiveUtils.reactiveStorage('sessionStorage', 'formDraft');
 
 // Save form on input
-document.querySelectorAll('input, textarea').forEach(field => {
+querySelectorAll('input, textarea').forEach(field => {
   field.addEventListener('input', () => {
     const form = {};
-    document.querySelectorAll('input, textarea').forEach(f => {
+    querySelectorAll('input, textarea').forEach(f => {
       form[f.name] = f.value;
     });
     formData.set('draft', form);
@@ -264,7 +264,7 @@ window.addEventListener('load', () => {
   const draft = formData.get('draft');
   if (draft) {
     Object.entries(draft).forEach(([name, value]) => {
-      const field = document.querySelector(`[name="${name}"]`);
+      const field = querySelector(`[name="${name}"]`);
       if (field) field.value = value;
     });
   }
@@ -318,7 +318,7 @@ ReactiveUtils.effect(() => {
   const html = pages.slice(0, 10).map(page => `
     <li><a href="${page.url}">${page.title}</a></li>
   `).join('');
-  document.getElementById('history').innerHTML = html;
+  querySelector('#history').innerHTML = html;
 });
 
 // Track page visits
@@ -339,7 +339,7 @@ ReactiveUtils.effect(() => {
   const lastSync = sync.get('lastSync');
   const pending = sync.get('pendingChanges') || 0;
 
-  const indicator = document.getElementById('syncStatus');
+  const indicator = querySelector('#syncStatus');
   if (pending > 0) {
     indicator.textContent = `${pending} pending changes`;
     indicator.className = 'syncing';
@@ -551,3 +551,193 @@ localStorage.setItem('user', JSON.stringify({ name: 'John' }));
 ## **Summary**
 
 `proxy.set(key, value, options)` is a method on the reactive storage proxy returned by `reactiveStorage()` that stores a value in browser storage (localStorage or sessionStorage) and triggers reactive updates in any effects or computed properties tracking that storage. When called, it automatically serializes the value to JSON, wraps it with metadata (timestamp and optional expiration), stores it with a namespaced key, and increments an internal reactive version number that triggers all tracking effects to re-run. The method returns true on success or false if storage fails (quota exceeded, serialization error, etc.). Use `proxy.set()` when you need to store data in browser storage and want UI components or other reactive logic to automatically update when that data changes. It's perfect for user preferences, form auto-save, cached API responses, cross-tab messaging, and any scenario where multiple parts of your application need to react to storage changes. Unlike native localStorage.setItem(), proxy.set() provides automatic JSON handling, built-in expiration support, namespace management, and most importantly, reactive updates that keep your UI synchronized with storage changes.
+
+---
+
+## **Advanced: Reactive Bindings with Global Shortcuts**
+
+These examples demonstrate the power of combining reactive storage with global DOM shortcuts (`ClassName`, `tagName`, `Name`, `querySelectorAll`) for clean, scalable reactive UIs.
+
+### **Example: Batch Updates with ClassName**
+```javascript
+const storage = ReactiveUtils.reactiveStorage('localStorage', 'ui');
+
+// Set theme - automatically updates ALL elements with class
+storage.set('theme', 'dark');
+
+ReactiveUtils.effect(() => {
+  const theme = storage.get('theme');
+
+  // Update all .theme-aware elements at once
+  ClassName('theme-aware').updateAll(el => {
+    el.dataset.theme = theme;
+    el.classList.toggle('dark-mode', theme === 'dark');
+    el.classList.toggle('light-mode', theme === 'light');
+  });
+});
+
+// Change theme - all .theme-aware elements update instantly
+storage.set('theme', 'light');
+```
+
+**Why this is powerful:**
+- `ClassName()` selects ALL matching elements
+- `updateAll()` applies changes to all at once
+- Changing storage triggers ONE effect that updates EVERYTHING
+- No manual loops, no getElementById for each element
+
+### **Example: Reactive Forms with Name**
+```javascript
+const formData = ReactiveUtils.reactiveStorage('sessionStorage', 'form');
+
+// Restore all form fields by name
+ReactiveUtils.effect(() => {
+  const savedData = formData.get('draft');
+  if (!savedData) return;
+
+  // Restore all fields using Name shortcut
+  Object.entries(savedData).forEach(([name, value]) => {
+    Name(name).updateAll(field => {
+      if (field.type === 'checkbox') {
+        field.checked = value;
+      } else {
+        field.value = value;
+      }
+    });
+  });
+});
+
+// Auto-save on any input change
+querySelectorAll('input, textarea, select').forEach(field => {
+  field.addEventListener('input', () => {
+    const draft = {};
+    querySelectorAll('[name]').forEach(f => {
+      draft[f.name] = f.type === 'checkbox' ? f.checked : f.value;
+    });
+    formData.set('draft', draft);
+  });
+});
+```
+
+**Why this scales:**
+- `Name()` finds all fields with same name (radio buttons, etc.)
+- Works with any form size
+- Single effect handles all restorations
+- No hardcoded IDs
+
+### **Example: Live Stats with tagName**
+```javascript
+const stats = ReactiveUtils.reactiveStorage('localStorage', 'analytics');
+
+// Update all stat displays
+ReactiveUtils.effect(() => {
+  const data = stats.get('metrics') || {};
+
+  // Update all <output> elements showing stats
+  tagName('output').updateAll(el => {
+    const metric = el.dataset.metric;
+    if (metric && data[metric]) {
+      el.textContent = data[metric].toLocaleString();
+    }
+  });
+});
+
+// Update stats
+stats.set('metrics', {
+  users: 1234,
+  posts: 5678,
+  views: 98765
+});
+
+// HTML:
+// <output data-metric="users"></output>
+// <output data-metric="posts"></output>
+// <output data-metric="views"></output>
+```
+
+**Why this is elegant:**
+- `tagName('output')` selects all output elements
+- `data-metric` attribute links element to data
+- One effect updates all metrics
+- Add more `<output>` elements, they work automatically
+
+### **Example: Multi-Section Updates**
+```javascript
+const settings = ReactiveUtils.reactiveStorage('localStorage', 'prefs');
+
+// Initialize
+settings.set('fontSize', 16);
+settings.set('theme', 'dark');
+settings.set('language', 'en');
+
+// Update all sections reactively
+ReactiveUtils.effect(() => {
+  const fontSize = settings.get('fontSize');
+  const theme = settings.get('theme');
+  const language = settings.get('language');
+
+  // Update all .font-size-aware elements
+  ClassName('font-size-aware').updateAll(el => {
+    el.style.fontSize = fontSize + 'px';
+  });
+
+  // Update all .theme-aware elements
+  ClassName('theme-aware').updateAll(el => {
+    el.dataset.theme = theme;
+  });
+
+  // Update all language displays
+  ClassName('lang-display').updateAll(el => {
+    el.textContent = language;
+  });
+});
+
+// Change any setting - all related elements update
+settings.set('fontSize', 18);  // All .font-size-aware update
+settings.set('theme', 'light'); // All .theme-aware update
+```
+
+**The power of this approach:**
+- Class-based targeting (semantic, reusable)
+- One effect per setting type
+- Scales to any number of elements
+- Zero hardcoded IDs or selectors
+
+### **Example: Reactive Dashboard**
+```javascript
+const dashboard = ReactiveUtils.reactiveStorage('localStorage', 'dashboard');
+
+// Set data
+dashboard.set('widgets', [
+  { id: 'sales', value: 45000, trend: '+12%' },
+  { id: 'users', value: 1234, trend: '+5%' },
+  { id: 'revenue', value: 98000, trend: '+8%' }
+]);
+
+ReactiveUtils.effect(() => {
+  const widgets = dashboard.get('widgets') || [];
+
+  widgets.forEach(widget => {
+    // Update each widget using ClassName
+    ClassName(`widget-${widget.id}`).updateAll(el => {
+      querySelector('.value', el).textContent = widget.value.toLocaleString();
+      querySelector('.trend', el).textContent = widget.trend;
+      querySelector('.trend', el).classList.toggle('positive', widget.trend.startsWith('+'));
+    });
+  });
+});
+
+// Update one widget - only that widget's UI updates
+const currentWidgets = dashboard.get('widgets');
+currentWidgets[0].value = 50000;
+currentWidgets[0].trend = '+18%';
+dashboard.set('widgets', currentWidgets);
+```
+
+**Key benefits:**
+- Widget-based architecture
+- Each widget updates independently
+- Using `ClassName()` for scoped selection
+- Nested `querySelector()` for widget internals
+- Declarative and maintainable
+

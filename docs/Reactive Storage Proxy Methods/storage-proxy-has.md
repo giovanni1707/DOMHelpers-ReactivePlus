@@ -139,13 +139,13 @@ ReactiveUtils.effect(() => {
   const isLoggedIn = auth.has('token');
 
   if (isLoggedIn) {
-    document.getElementById('loginBtn').style.display = 'none';
-    document.getElementById('logoutBtn').style.display = 'block';
-    document.getElementById('userPanel').style.display = 'block';
+    querySelector('#loginBtn').style.display = 'none';
+    querySelector('#logoutBtn').style.display = 'block';
+    querySelector('#userPanel').style.display = 'block';
   } else {
-    document.getElementById('loginBtn').style.display = 'block';
-    document.getElementById('logoutBtn').style.display = 'none';
-    document.getElementById('userPanel').style.display = 'none';
+    querySelector('#loginBtn').style.display = 'block';
+    querySelector('#logoutBtn').style.display = 'none';
+    querySelector('#userPanel').style.display = 'none';
   }
 });
 
@@ -183,9 +183,9 @@ ReactiveUtils.effect(() => {
   const hasNewFeature = features.has('betaFeature');
 
   if (hasNewFeature) {
-    document.getElementById('betaFeature').style.display = 'block';
+    querySelector('#betaFeature').style.display = 'block';
   } else {
-    document.getElementById('betaFeature').style.display = 'none';
+    querySelector('#betaFeature').style.display = 'none';
   }
 });
 
@@ -207,7 +207,7 @@ const notifications = ReactiveUtils.reactiveStorage('localStorage', 'notificatio
 // Reactive notification badge
 ReactiveUtils.effect(() => {
   const hasNotifications = notifications.has('unread');
-  const badge = document.getElementById('notificationBadge');
+  const badge = querySelector('#notificationBadge');
 
   if (hasNotifications) {
     const unread = notifications.get('unread');
