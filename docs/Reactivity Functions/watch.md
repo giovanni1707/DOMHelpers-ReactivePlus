@@ -496,7 +496,7 @@ watch(theme, {
     document.body.classList.add(`${newMode}-mode`);
 
     // Update meta tag
-    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const metaTheme = querySelector('meta[name="theme-color"]');
     metaTheme.content = newMode === 'dark' ? '#1a1a1a' : '#ffffff';
   },
   primaryColor: (newColor) => {

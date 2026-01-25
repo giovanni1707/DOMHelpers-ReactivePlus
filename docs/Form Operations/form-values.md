@@ -187,7 +187,7 @@ const form = Forms.createForm({ name: '', bio: '' });
 
 // Auto-update display when values change
 effect(() => {
-  const preview = document.querySelector('#preview');
+  const preview = querySelector('#preview');
   preview.innerHTML = `
     <h3>${form.values.name || 'No name'}</h3>
     <p>${form.values.bio || 'No bio'}</p>
@@ -231,7 +231,7 @@ const form = Forms.createForm({ bio: '' });
 const maxChars = 200;
 
 effect(() => {
-  const counter = document.querySelector('#char-counter');
+  const counter = querySelector('#char-counter');
   const remaining = maxChars - form.values.bio.length;
 
   counter.textContent = `${remaining} characters remaining`;
@@ -248,7 +248,7 @@ const form = Forms.createForm({
 });
 
 effect(() => {
-  const companyFields = document.querySelector('#company-fields');
+  const companyFields = querySelector('#company-fields');
 
   // Show/hide based on account type
   if (form.values.accountType === 'business') {
@@ -302,7 +302,7 @@ effect(() => {
   const discountAmount = subtotal * (form.values.discount / 100);
   const total = subtotal - discountAmount;
 
-  const summary = document.querySelector('#order-summary');
+  const summary = querySelector('#order-summary');
   summary.innerHTML = `
     <div>Subtotal: $${subtotal.toFixed(2)}</div>
     <div>Discount: -$${discountAmount.toFixed(2)}</div>
@@ -326,7 +326,7 @@ function hasChanges() {
 }
 
 effect(() => {
-  const status = document.querySelector('#save-status');
+  const status = querySelector('#save-status');
 
   if (hasChanges()) {
     status.textContent = 'Unsaved changes';

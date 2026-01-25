@@ -253,7 +253,7 @@ const form = Forms.createForm({ email: '' }, {
 });
 
 effect(() => {
-  const errorEl = document.querySelector('#email-error');
+  const errorEl = querySelector('#email-error');
 
   if (form.touched.email && form.errors.email) {
     errorEl.textContent = form.errors.email;

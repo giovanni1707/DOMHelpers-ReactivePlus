@@ -71,14 +71,14 @@ function abort(asyncState) {
 ```javascript
 const asyncState = ReactiveUtils.asyncState();
 
-document.querySelector('#load-btn').addEventListener('click', () => {
+querySelector('#load-btn').addEventListener('click', () => {
   execute(asyncState, async (signal) => {
     const response = await fetch('/api/data', { signal });
     return response.json();
   });
 });
 
-document.querySelector('#cancel-btn').addEventListener('click', () => {
+querySelector('#cancel-btn').addEventListener('click', () => {
   abort(asyncState);
 });
 ```

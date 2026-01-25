@@ -162,7 +162,7 @@ effect(() => {
 ```javascript
 const form = Forms.createForm({ name: '', bio: '' });
 
-const saveButton = document.querySelector('#save');
+const saveButton = querySelector('#save');
 
 effect(() => {
   saveButton.style.display = form.isDirty ? 'block' : 'none';
@@ -193,7 +193,7 @@ function handleReset() {
 const form = Forms.createForm({ username: '', email: '' });
 
 effect(() => {
-  const indicator = document.querySelector('#form-state');
+  const indicator = querySelector('#form-state');
 
   if (!form.isDirty) {
     indicator.textContent = '○ Pristine';
@@ -235,7 +235,7 @@ const form = Forms.createForm({ name: '', email: '' }, {
 });
 
 effect(() => {
-  const submitBtn = document.querySelector('#submit');
+  const submitBtn = querySelector('#submit');
 
   // Enable only if dirty AND valid
   submitBtn.disabled = !form.isDirty || !form.isValid;
@@ -276,9 +276,9 @@ router.beforeNavigate((to, from, next) => {
 const form = Forms.createForm({ post: '' });
 
 effect(() => {
-  const publishBtn = document.querySelector('#publish');
-  const draftBtn = document.querySelector('#draft');
-  const discardBtn = document.querySelector('#discard');
+  const publishBtn = querySelector('#publish');
+  const draftBtn = querySelector('#draft');
+  const discardBtn = querySelector('#discard');
 
   if (!form.isDirty) {
     publishBtn.hidden = true;
@@ -298,7 +298,7 @@ const form = Forms.createForm({ name: '', email: '', phone: '' });
 
 effect(() => {
   const count = form.touchedFields.length;
-  const status = document.querySelector('#dirty-status');
+  const status = querySelector('#dirty-status');
 
   if (!form.isDirty) {
     status.textContent = 'No changes made';

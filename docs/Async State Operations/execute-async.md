@@ -147,7 +147,7 @@ await execute(asyncState, async (signal) => {
 const asyncState = ReactiveUtils.asyncState();
 
 effect(() => {
-  const status = document.querySelector('#status');
+  const status = querySelector('#status');
   
   if (asyncState.loading) {
     status.textContent = 'Loading...';

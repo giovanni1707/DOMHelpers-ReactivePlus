@@ -68,7 +68,7 @@ const asyncState = ReactiveUtils.asyncState(initialValue);
 const asyncState = ReactiveUtils.asyncState(null);
 
 effect(() => {
-  const container = document.querySelector('#data-container');
+  const container = querySelector('#data-container');
   
   if (asyncState.loading) {
     container.innerHTML = '<p>Loading...</p>';
@@ -102,8 +102,8 @@ effect(() => {
 const asyncState = ReactiveUtils.asyncState(null);
 
 effect(() => {
-  const emptyState = document.querySelector('#empty-state');
-  const dataView = document.querySelector('#data-view');
+  const emptyState = querySelector('#empty-state');
+  const dataView = querySelector('#data-view');
   
   if (!asyncState.data || asyncState.data.length === 0) {
     emptyState.style.display = 'block';

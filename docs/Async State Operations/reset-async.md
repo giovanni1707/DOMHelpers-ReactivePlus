@@ -78,9 +78,9 @@ const searchState = ReactiveUtils.asyncState(null);
 await execute(searchState, fetchResults);
 
 // User clears search
-document.querySelector('#clear-btn').addEventListener('click', () => {
+querySelector('#clear-btn').addEventListener('click', () => {
   reset(searchState);
-  document.querySelector('#search-input').value = '';
+  querySelector('#search-input').value = '';
 });
 ```
 

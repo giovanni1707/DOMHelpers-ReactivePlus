@@ -187,7 +187,7 @@ const boundary = new ErrorBoundary({
   }
 });
 
-const button = document.querySelector('#btn');
+const button = querySelector('#btn');
 
 button.addEventListener('click', boundary.wrap(
   (event) => {

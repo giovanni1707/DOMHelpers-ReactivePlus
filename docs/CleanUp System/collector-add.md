@@ -129,7 +129,7 @@ collector.cleanup(); // Disposes the effect
 ### **Example 5: Event Listeners**
 ```javascript
 const collector = ReactiveUtils.collector();
-const button = document.querySelector('#btn');
+const button = querySelector('#btn');
 
 const handleClick = () => console.log('Clicked');
 button.addEventListener('click', handleClick);

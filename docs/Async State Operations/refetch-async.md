@@ -83,7 +83,7 @@ await execute(asyncState, async (signal) => {
 });
 
 // Refresh button
-document.querySelector('#refresh-btn').addEventListener('click', async () => {
+querySelector('#refresh-btn').addEventListener('click', async () => {
   await refetch(asyncState);
 });
 ```
@@ -129,7 +129,7 @@ const asyncState = ReactiveUtils.asyncState();
 
 effect(() => {
   if (asyncState.error) {
-    const retryBtn = document.querySelector('#retry-btn');
+    const retryBtn = querySelector('#retry-btn');
     retryBtn.style.display = 'block';
     
     retryBtn.onclick = () => refetch(asyncState);

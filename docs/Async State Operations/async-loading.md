@@ -14,7 +14,7 @@ console.log(asyncState.loading); // true
 
 // Reactive loading indicator
 effect(() => {
-  const spinner = document.querySelector('#spinner');
+  const spinner = querySelector('#spinner');
   spinner.style.display = asyncState.loading ? 'block' : 'none';
 });
 ```
@@ -62,7 +62,7 @@ asyncState.loading: boolean
 const asyncState = ReactiveUtils.asyncState();
 
 effect(() => {
-  const spinner = document.querySelector('#loading-spinner');
+  const spinner = querySelector('#loading-spinner');
   
   if (asyncState.loading) {
     spinner.classList.add('visible');
@@ -79,7 +79,7 @@ await execute(asyncState, fetchData);
 const asyncState = ReactiveUtils.asyncState();
 
 effect(() => {
-  const submitBtn = document.querySelector('#submit-btn');
+  const submitBtn = querySelector('#submit-btn');
   
   submitBtn.disabled = asyncState.loading;
   submitBtn.textContent = asyncState.loading ? 'Loading...' : 'Submit';
@@ -91,7 +91,7 @@ effect(() => {
 const asyncState = ReactiveUtils.asyncState();
 
 effect(() => {
-  const overlay = document.querySelector('#overlay');
+  const overlay = querySelector('#overlay');
   
   if (asyncState.loading) {
     overlay.style.display = 'flex';
@@ -124,7 +124,7 @@ effect(() => {
 const asyncState = ReactiveUtils.asyncState();
 
 effect(() => {
-  const status = document.querySelector('#status');
+  const status = querySelector('#status');
   
   if (asyncState.loading) {
     status.textContent = 'Loading data, please wait...';

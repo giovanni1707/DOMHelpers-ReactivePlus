@@ -64,7 +64,7 @@ asyncState.error: Error | null
 const asyncState = ReactiveUtils.asyncState();
 
 effect(() => {
-  const errorEl = document.querySelector('#error-message');
+  const errorEl = querySelector('#error-message');
   
   if (asyncState.error) {
     errorEl.textContent = asyncState.error.message;
@@ -99,7 +99,7 @@ effect(() => {
 const asyncState = ReactiveUtils.asyncState();
 
 effect(() => {
-  const retryBtn = document.querySelector('#retry-btn');
+  const retryBtn = querySelector('#retry-btn');
   
   if (asyncState.error) {
     retryBtn.style.display = 'block';
@@ -133,7 +133,7 @@ effect(() => {
 const asyncState = ReactiveUtils.asyncState();
 
 effect(() => {
-  const container = document.querySelector('#container');
+  const container = querySelector('#container');
   
   if (asyncState.loading) {
     container.innerHTML = '<p>Loading...</p>';

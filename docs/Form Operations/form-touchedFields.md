@@ -154,7 +154,7 @@ const totalFields = 4;
 
 effect(() => {
   const completed = form.touchedFields.length;
-  const progress = document.querySelector('#progress');
+  const progress = querySelector('#progress');
 
   progress.textContent = `${completed} / ${totalFields} fields completed`;
   progress.style.width = `${(completed / totalFields) * 100}%`;
@@ -166,7 +166,7 @@ effect(() => {
 const form = Forms.createForm({ name: '', email: '', phone: '' });
 
 effect(() => {
-  const list = document.querySelector('#touched-list');
+  const list = querySelector('#touched-list');
 
   if (form.touchedFields.length === 0) {
     list.innerHTML = '<li>No fields touched yet</li>';
@@ -190,7 +190,7 @@ const form = Forms.createForm({
 const minFieldsRequired = 2;
 
 effect(() => {
-  const saveBtn = document.querySelector('#save');
+  const saveBtn = querySelector('#save');
 
   saveBtn.disabled = form.touchedFields.length < minFieldsRequired;
   saveBtn.title = `At least ${minFieldsRequired} fields must be edited`;
@@ -207,7 +207,7 @@ const form = Forms.createForm({
 });
 
 effect(() => {
-  const summary = document.querySelector('#summary');
+  const summary = querySelector('#summary');
   const count = form.touchedFields.length;
 
   if (count === 0) {
@@ -313,13 +313,13 @@ const form = Forms.createForm({
 
 effect(() => {
   // Remove all highlights
-  document.querySelectorAll('input').forEach(input => {
+  querySelectorAll('input').forEach(input => {
     input.classList.remove('touched');
   });
 
   // Add highlights to touched fields
   form.touchedFields.forEach(field => {
-    const input = document.querySelector(`input[name="${field}"]`);
+    const input = querySelector(`input[name="${field}"]`);
     if (input) {
       input.classList.add('touched');
     }
@@ -336,7 +336,7 @@ const form = Forms.createForm({
 });
 
 effect(() => {
-  const badge = document.querySelector('#unsaved-badge');
+  const badge = querySelector('#unsaved-badge');
   const count = form.touchedFields.length;
 
   if (count > 0) {

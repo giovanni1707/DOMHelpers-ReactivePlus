@@ -154,7 +154,7 @@ const form = Forms.createForm({ email: '', name: '' }, {
   }
 });
 
-const errorBanner = document.querySelector('#error-banner');
+const errorBanner = querySelector('#error-banner');
 
 effect(() => {
   if (form.hasErrors) {
@@ -204,7 +204,7 @@ const form = Forms.createForm({
 });
 
 effect(() => {
-  const summaryEl = document.querySelector('#error-summary');
+  const summaryEl = querySelector('#error-summary');
 
   if (form.hasErrors) {
     const errorList = form.errorFields
@@ -230,7 +230,7 @@ const form = Forms.createForm({ step1: '', step2: '', step3: '' }, {
 });
 
 effect(() => {
-  const progress = document.querySelector('#progress');
+  const progress = querySelector('#progress');
 
   if (!form.isDirty) {
     progress.textContent = 'Not started';
@@ -251,7 +251,7 @@ const form = Forms.createForm({ email: '', phone: '' }, {
   }
 });
 
-const formEl = document.querySelector('#myForm');
+const formEl = querySelector('#myForm');
 
 effect(() => {
   if (form.hasErrors) {
@@ -281,7 +281,7 @@ const form = Forms.createForm({
 });
 
 effect(() => {
-  const badge = document.querySelector('#error-badge');
+  const badge = querySelector('#error-badge');
 
   if (form.hasErrors) {
     const count = form.errorFields.length;
@@ -303,7 +303,7 @@ const form = Forms.createForm({ email: '', password: '' }, {
 });
 
 effect(() => {
-  const submitBtn = document.querySelector('#submit');
+  const submitBtn = querySelector('#submit');
 
   if (form.isSubmitting) {
     submitBtn.textContent = 'Submitting...';
@@ -360,7 +360,7 @@ const form = Forms.createForm({ username: '' }, {
 });
 
 effect(() => {
-  const message = document.querySelector('#validation-message');
+  const message = querySelector('#validation-message');
 
   if (!form.isDirty) {
     message.textContent = '';

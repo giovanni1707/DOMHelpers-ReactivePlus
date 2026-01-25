@@ -225,8 +225,8 @@ collector.cleanup();
 const collector = ReactiveUtils.collector();
 
 function setupListeners() {
-  const button = document.querySelector('#btn');
-  const input = document.querySelector('#input');
+  const button = querySelector('#btn');
+  const input = querySelector('#input');
   
   const clickHandler = () => console.log('Click');
   const inputHandler = () => console.log('Input');

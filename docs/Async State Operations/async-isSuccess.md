@@ -72,7 +72,7 @@ asyncState.$computed('isSuccess', function() {
 const asyncState = ReactiveUtils.asyncState();
 
 effect(() => {
-  const message = document.querySelector('#success-message');
+  const message = querySelector('#success-message');
   
   if (asyncState.isSuccess) {
     message.textContent = '✓ Data loaded successfully';
@@ -89,7 +89,7 @@ effect(() => {
 const asyncState = ReactiveUtils.asyncState();
 
 effect(() => {
-  const container = document.querySelector('#container');
+  const container = querySelector('#container');
   
   if (asyncState.isIdle) {
     container.innerHTML = '<p>Click load to fetch data</p>';
@@ -125,8 +125,8 @@ effect(() => {
 const asyncState = ReactiveUtils.asyncState();
 
 effect(() => {
-  const exportBtn = document.querySelector('#export-btn');
-  const shareBtn = document.querySelector('#share-btn');
+  const exportBtn = querySelector('#export-btn');
+  const shareBtn = querySelector('#share-btn');
   
   exportBtn.disabled = !asyncState.isSuccess;
   shareBtn.disabled = !asyncState.isSuccess;
@@ -138,7 +138,7 @@ effect(() => {
 const asyncState = ReactiveUtils.asyncState();
 
 effect(() => {
-  const content = document.querySelector('#content');
+  const content = querySelector('#content');
   
   if (asyncState.isSuccess) {
     content.classList.add('fade-in');

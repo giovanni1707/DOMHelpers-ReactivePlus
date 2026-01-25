@@ -194,7 +194,7 @@ const form = Forms.createForm({ email: '', password: '' }, {
   }
 });
 
-const submitBtn = document.querySelector('#submit');
+const submitBtn = querySelector('#submit');
 
 effect(() => {
   submitBtn.disabled = form.isSubmitting;
@@ -217,8 +217,8 @@ const form = Forms.createForm({ email: '' }, {
 });
 
 effect(() => {
-  const spinner = document.querySelector('#loading-spinner');
-  const submitBtn = document.querySelector('#submit');
+  const spinner = querySelector('#loading-spinner');
+  const submitBtn = querySelector('#submit');
 
   if (form.isSubmitting) {
     spinner.style.display = 'inline-block';
@@ -265,7 +265,7 @@ const form = Forms.createForm({ name: '', email: '' }, {
 });
 
 effect(() => {
-  const submitBtn = document.querySelector('#submit');
+  const submitBtn = querySelector('#submit');
 
   if (form.isSubmitting) {
     submitBtn.innerHTML = `
@@ -296,7 +296,7 @@ const form = Forms.createForm({
 });
 
 effect(() => {
-  const inputs = document.querySelectorAll('input');
+  const inputs = querySelectorAll('input');
 
   inputs.forEach(input => {
     input.disabled = form.isSubmitting;
@@ -313,7 +313,7 @@ const form = Forms.createForm({ data: '' }, {
 });
 
 effect(() => {
-  const overlay = document.querySelector('#submit-overlay');
+  const overlay = querySelector('#submit-overlay');
 
   if (form.isSubmitting) {
     overlay.classList.add('visible');
@@ -345,7 +345,7 @@ const form = Forms.createForm({ email: '' }, {
 });
 
 effect(() => {
-  const status = document.querySelector('#status');
+  const status = querySelector('#status');
 
   if (form.isSubmitting) {
     status.textContent = `Submitting... (Attempt ${form.submitCount + 1})`;
@@ -394,8 +394,8 @@ const form = Forms.createForm({
 });
 
 effect(() => {
-  const steps = document.querySelectorAll('.step');
-  const submitBtn = document.querySelector('#submit');
+  const steps = querySelectorAll('.step');
+  const submitBtn = querySelector('#submit');
 
   if (form.isSubmitting) {
     // Disable all step navigation
@@ -445,8 +445,8 @@ async function handleSubmit() {
 }
 
 effect(() => {
-  const submitBtn = document.querySelector('#submit');
-  const message = document.querySelector('#message');
+  const submitBtn = querySelector('#submit');
+  const message = querySelector('#message');
 
   if (form.isSubmitting) {
     submitBtn.disabled = true;
@@ -496,7 +496,7 @@ async function handleSubmit() {
 ### **Pattern 5: Disable All Inputs**
 ```javascript
 effect(() => {
-  document.querySelectorAll('input, button').forEach(el => {
+  querySelectorAll('input, button').forEach(el => {
     el.disabled = form.isSubmitting;
   });
 });

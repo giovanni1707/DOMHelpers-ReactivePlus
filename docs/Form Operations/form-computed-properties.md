@@ -407,7 +407,7 @@ const form = ReactiveUtils.form({
 ReactiveUtils.effect(() => {
   // Only show US-specific fields if country is US
   const isUS = form.values.country === 'US';
-  const usFields = document.querySelectorAll('.us-only');
+  const usFields = querySelectorAll('.us-only');
 
   usFields.forEach(field => {
     field.style.display = isUS ? 'block' : 'none';

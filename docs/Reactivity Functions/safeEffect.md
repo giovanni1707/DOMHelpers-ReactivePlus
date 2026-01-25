@@ -138,7 +138,7 @@ safeEffect(async () => {
 const config = state({ selector: '#content' });
 
 safeEffect(() => {
-  const element = document.querySelector(config.selector);
+  const element = querySelector(config.selector);
   element.textContent = 'Updated'; // Might be null
 }, {
   onError: (error) => {

@@ -91,7 +91,7 @@ const asyncState = ReactiveUtils.asyncState();
 execute(asyncState, fetchData);
 
 // User clicks cancel
-document.querySelector('#cancel-btn').addEventListener('click', () => {
+querySelector('#cancel-btn').addEventListener('click', () => {
   if (asyncState.abortController) {
     asyncState.abortController.abort();
   }

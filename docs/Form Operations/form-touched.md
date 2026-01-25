@@ -173,8 +173,8 @@ const form = Forms.createForm({ email: '', password: '' }, {
 });
 
 effect(() => {
-  const emailErrorEl = document.querySelector('#email-error');
-  const passwordErrorEl = document.querySelector('#password-error');
+  const emailErrorEl = querySelector('#email-error');
+  const passwordErrorEl = querySelector('#password-error');
 
   // Only show error if field was touched
   emailErrorEl.textContent = form.touched.email && form.errors.email
@@ -191,19 +191,19 @@ effect(() => {
 ```javascript
 const form = Forms.createForm({ name: '', email: '' });
 
-document.querySelector('#name').addEventListener('blur', () => {
+querySelector('#name').addEventListener('blur', () => {
   form.setTouched('name', true);
   form.validateField('name');
 });
 
-document.querySelector('#email').addEventListener('blur', () => {
+querySelector('#email').addEventListener('blur', () => {
   form.setTouched('email', true);
   form.validateField('email');
 });
 
 // Or use the built-in handler
 const handleBlur = form.handleBlur();
-document.querySelector('#name').addEventListener('blur', handleBlur);
+querySelector('#name').addEventListener('blur', handleBlur);
 ```
 
 ### **Example 3: Mark All Fields as Touched on Submit**
@@ -246,7 +246,7 @@ const form = Forms.createForm({
 });
 
 effect(() => {
-  const counter = document.querySelector('#touched-counter');
+  const counter = querySelector('#touched-counter');
   const touchedCount = Object.keys(form.touched).length;
   const totalFields = Object.keys(form.values).length;
 
@@ -265,8 +265,8 @@ const form = Forms.createForm({ username: '', email: '' }, {
 
 effect(() => {
   Object.keys(form.values).forEach(field => {
-    const input = document.querySelector(`input[name="${field}"]`);
-    const errorEl = document.querySelector(`#${field}-error`);
+    const input = querySelector(`input[name="${field}"]`);
+    const errorEl = querySelector(`#${field}-error`);
 
     // Only show validation state if touched
     if (form.touched[field]) {
@@ -327,7 +327,7 @@ function validateTouchedFields() {
 }
 
 // Call on blur, not on every keystroke
-document.querySelectorAll('input').forEach(input => {
+querySelectorAll('input').forEach(input => {
   input.addEventListener('blur', () => {
     form.setTouched(input.name, true);
     validateTouchedFields();
@@ -346,7 +346,7 @@ const form = Forms.createForm({
 effect(() => {
   // Add visual indicator to touched fields
   Object.keys(form.touched).forEach(field => {
-    const input = document.querySelector(`input[name="${field}"]`);
+    const input = querySelector(`input[name="${field}"]`);
     if (input) {
       input.classList.add('touched');
     }

@@ -740,7 +740,7 @@ function navigateAway() {
 }
 
 // Attach to navigation
-document.querySelectorAll('a').forEach(link => {
+querySelectorAll('a').forEach(link => {
   link.addEventListener('click', (e) => {
     if (!navigateAway()) {
       e.preventDefault();

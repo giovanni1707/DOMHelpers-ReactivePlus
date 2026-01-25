@@ -337,7 +337,7 @@ link.url = 'https://newsite.com';
 5. **Validate selectors**
    ```javascript
    // Ensure elements exist before binding
-   if (document.querySelector('#myElement')) {
+   if (querySelector('#myElement')) {
      builder.bind({ '#myElement': 'value' });
    }
    ```

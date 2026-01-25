@@ -214,15 +214,50 @@ At first glance, this looks fine. But there's a hidden limitation.
 
 ---
 
+When writing examples, documentation, or code:
+
+Always prefer global shortcut APIs over verbose namespaces.
+
+✅ Element & Collection Access
+
+Do NOT use:
+
+Collection.ClassName
+
+Collection.tagName
+
+Collection.Name
+
+Use instead:
+ClassName
+tagName
+Name
+
+✅ Selector Usage
+
+Do NOT use:
+Selector.query()
+Selector.queryAll()
+
+Use instead:
+querySelector()
+querySelectorAll()
+
+📌 Rules
+Apply this consistently across all examples, snippets, and explanations
+The goal is to keep code clean, concise, and beginner-friendly
+Namespace-based APIs should only be mentioned once for learning purposes, never used in examples
+If a global shortcut exists, it must be used by default.
+
 ## Important Documentation Rules You Must Strictly Follow:
 
 ### 1. Method Naming Convention
-
+**Very Important**
 - Use **only non-`$` prefixed methods** in *all* documentation, explanations, examples, and comparisons.
 - Do **not** mention or demonstrate `$`-prefixed methods.
 - Assume that the project uses `09_dh-reactive-namespace-methods.js`, which exposes the official public API.
 - Treat non-`$` methods as the **standard and final API** across the entire project.
-
+- Use only **shortcut** methods name not full namespace as possible.
 ### 2. Tone When Explaining "What Problem This Method Solves"
 
 - Never describe existing methods in the Reactive library as *bad*, *limited*, *wrong*, or *inferior*.

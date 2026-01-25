@@ -188,8 +188,8 @@ const form = Forms.createForm({ email: '', password: '' }, {
 });
 
 effect(() => {
-  const emailErrorEl = document.querySelector('#email-error');
-  const passwordErrorEl = document.querySelector('#password-error');
+  const emailErrorEl = querySelector('#email-error');
+  const passwordErrorEl = querySelector('#password-error');
 
   emailErrorEl.textContent = form.errors.email || '';
   passwordErrorEl.textContent = form.errors.password || '';
@@ -215,7 +215,7 @@ const form = Forms.createForm({
 });
 
 effect(() => {
-  const summaryEl = document.querySelector('#error-summary');
+  const summaryEl = querySelector('#error-summary');
 
   // Get all non-null errors
   const errors = Object.entries(form.errors)
@@ -295,7 +295,7 @@ const form = Forms.createForm({ password: '', confirmPassword: '' }, {
 });
 
 effect(() => {
-  const errorEl = document.querySelector('#password-error');
+  const errorEl = querySelector('#password-error');
 
   if (form.errors.password) {
     errorEl.textContent = form.errors.password;
@@ -328,13 +328,13 @@ const form = Forms.createForm({
 
 effect(() => {
   // Clear all highlights
-  document.querySelectorAll('input').forEach(input => {
+  querySelectorAll('input').forEach(input => {
     input.classList.remove('error', 'valid');
   });
 
   // Highlight based on error state
   Object.keys(form.errors).forEach(field => {
-    const input = document.querySelector(`input[name="${field}"]`);
+    const input = querySelector(`input[name="${field}"]`);
 
     if (input && form.touched[field]) {
       if (form.errors[field]) {
@@ -362,7 +362,7 @@ const form = Forms.createForm({
 });
 
 effect(() => {
-  const badge = document.querySelector('#error-badge');
+  const badge = querySelector('#error-badge');
 
   const errorCount = Object.values(form.errors)
     .filter(error => error) // Count non-null errors
@@ -415,7 +415,7 @@ const form = Forms.createForm({ username: '' }, {
 });
 
 effect(() => {
-  const errorEl = document.querySelector('#username-error');
+  const errorEl = querySelector('#username-error');
 
   if (form.errors.username) {
     errorEl.textContent = form.errors.username;
@@ -440,7 +440,7 @@ const form = Forms.createForm({
 
 effect(() => {
   Object.entries(form.errors).forEach(([field, error]) => {
-    const input = document.querySelector(`input[name="${field}"]`);
+    const input = querySelector(`input[name="${field}"]`);
 
     if (input) {
       if (error && form.touched[field]) {

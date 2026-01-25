@@ -120,9 +120,9 @@ dispose();
 ### **Example 3: Event Listeners Scope**
 ```javascript
 const dispose = ReactiveUtils.scope((add) => {
-  const button = document.querySelector('#btn');
-  const input = document.querySelector('#input');
-  const form = document.querySelector('#form');
+  const button = querySelector('#btn');
+  const input = querySelector('#input');
+  const form = querySelector('#form');
   
   const handleClick = () => console.log('Click');
   const handleInput = () => console.log('Input');
@@ -280,7 +280,7 @@ dispose();
 ### **Example 8: Observer Scope**
 ```javascript
 const dispose = ReactiveUtils.scope((add) => {
-  const element = document.querySelector('#target');
+  const element = querySelector('#target');
   
   // Resize Observer
   const resizeObserver = new ResizeObserver((entries) => {

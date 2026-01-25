@@ -154,7 +154,7 @@ const form = Forms.createForm({ username: '', email: '' }, {
   }
 });
 
-const submitBtn = document.querySelector('#submit');
+const submitBtn = querySelector('#submit');
 
 // Disable button when form is invalid
 effect(() => {
@@ -181,7 +181,7 @@ const form = Forms.createForm({
 });
 
 effect(() => {
-  const indicator = document.querySelector('#form-status');
+  const indicator = querySelector('#form-status');
 
   if (form.isValid) {
     indicator.textContent = '✓ Form is valid';
@@ -202,7 +202,7 @@ const step1Form = Forms.createForm({ name: '', email: '' }, {
   }
 });
 
-const nextButton = document.querySelector('#next-step');
+const nextButton = querySelector('#next-step');
 
 // Only allow proceeding when current step is valid
 nextButton.addEventListener('click', () => {
@@ -306,7 +306,7 @@ const form = Forms.createForm({
 
 function FormValidationBadge() {
   effect(() => {
-    const badge = document.querySelector('#validation-badge');
+    const badge = querySelector('#validation-badge');
 
     if (!form.isDirty) {
       badge.innerHTML = '○ Not started';

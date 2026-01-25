@@ -28,20 +28,3 @@ While reading the files, pay attention to:
 Once understanding is complete, confirm readiness and wait for the next instruction.
 
 ---
-
-## 💡 Optional Stricter Version (More Control)
-
-Use this if you want the AI to be extra disciplined:
-
-Read only the files inside:
-
-* `src/core/`
-* `src/enhancers/`
-* `src/conditions/`
-* `src/reactive/`
-
-**Treat these folders as the source of truth for the library.** Do not assume behavior that is not explicitly implemented in the code.
-
-Analyze the code step-by-step and infer the library's purpose, architecture, and usage patterns strictly from these files.
-
-After analysis, wait for further instructions.

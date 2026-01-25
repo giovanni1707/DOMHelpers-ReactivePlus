@@ -172,7 +172,7 @@ const form = Forms.createForm({
 });
 
 effect(() => {
-  const badge = document.querySelector('#error-badge');
+  const badge = querySelector('#error-badge');
   const count = form.errorFields.length;
 
   if (count > 0) {
@@ -200,7 +200,7 @@ const form = Forms.createForm({
 });
 
 effect(() => {
-  const errorList = document.querySelector('#error-summary');
+  const errorList = querySelector('#error-summary');
 
   if (form.errorFields.length === 0) {
     errorList.innerHTML = '<p class="success">All fields valid ✓</p>';
@@ -239,7 +239,7 @@ function handleSubmit(e) {
   if (form.errorFields.length > 0) {
     // Focus the first field with an error
     const firstErrorField = form.errorFields[0];
-    const input = document.querySelector(`input[name="${firstErrorField}"]`);
+    const input = querySelector(`input[name="${firstErrorField}"]`);
 
     if (input) {
       input.focus();
@@ -270,13 +270,13 @@ const form = Forms.createForm({
 
 effect(() => {
   // Remove all error highlights
-  document.querySelectorAll('input').forEach(input => {
+  querySelectorAll('input').forEach(input => {
     input.classList.remove('error');
   });
 
   // Add error class to fields with errors
   form.errorFields.forEach(field => {
-    const input = document.querySelector(`input[name="${field}"]`);
+    const input = querySelector(`input[name="${field}"]`);
     if (input) {
       input.classList.add('error');
     }
@@ -336,7 +336,7 @@ const form = Forms.createForm({
 });
 
 effect(() => {
-  const status = document.querySelector('#validation-status');
+  const status = querySelector('#validation-status');
 
   if (!form.isDirty) {
     status.textContent = '○ No fields touched';
@@ -364,7 +364,7 @@ const form = Forms.createForm({
 });
 
 effect(() => {
-  const submitBtn = document.querySelector('#submit');
+  const submitBtn = querySelector('#submit');
   const errorCount = form.errorFields.length;
 
   if (errorCount === 0 && form.isDirty) {
@@ -394,7 +394,7 @@ const form = Forms.createForm({
 
 effect(() => {
   form.errorFields.forEach(field => {
-    const input = document.querySelector(`input[name="${field}"]`);
+    const input = querySelector(`input[name="${field}"]`);
     const error = form.errors[field];
 
     if (input && error) {
@@ -407,7 +407,7 @@ effect(() => {
   // Clear attributes for valid fields
   Object.keys(form.values).forEach(field => {
     if (!form.errorFields.includes(field)) {
-      const input = document.querySelector(`input[name="${field}"]`);
+      const input = querySelector(`input[name="${field}"]`);
       if (input) {
         input.removeAttribute('title');
         input.setAttribute('aria-invalid', 'false');
@@ -438,7 +438,7 @@ effect(() => {
   const validFields = totalFields - form.errorFields.length;
   const percentage = (validFields / totalFields) * 100;
 
-  const progressBar = document.querySelector('#progress-bar');
+  const progressBar = querySelector('#progress-bar');
   progressBar.style.width = `${percentage}%`;
   progressBar.textContent = `${validFields}/${totalFields} valid`;
 
@@ -509,7 +509,7 @@ form.errorFields.forEach(field => {
 ```javascript
 if (form.errorFields.length > 0) {
   const firstError = form.errorFields[0];
-  document.querySelector(`input[name="${firstError}"]`).focus();
+  querySelector(`input[name="${firstError}"]`).focus();
 }
 ```
 

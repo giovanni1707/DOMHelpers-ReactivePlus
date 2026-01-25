@@ -83,7 +83,7 @@ Reset:     isIdle = true  (back to initial)
 const asyncState = ReactiveUtils.asyncState();
 
 effect(() => {
-  const message = document.querySelector('#message');
+  const message = querySelector('#message');
   
   if (asyncState.isIdle) {
     message.textContent = 'Click "Load Data" to begin';
@@ -113,7 +113,7 @@ effect(() => {
 const asyncState = ReactiveUtils.asyncState();
 
 effect(() => {
-  const loadBtn = document.querySelector('#load-btn');
+  const loadBtn = querySelector('#load-btn');
   
   if (asyncState.isIdle) {
     loadBtn.textContent = 'Load Data';

@@ -32,7 +32,7 @@ contactForm.bindToInputs('input, textarea');
 contactForm.bindToInputs('#contact-form input');
 
 // Or pass NodeList
-const inputs = document.querySelectorAll('[data-form="contact"]');
+const inputs = querySelectorAll('[data-form="contact"]');
 contactForm.bindToInputs(inputs);
 
 // Chainable

@@ -71,7 +71,7 @@ asyncState.$computed('isError', function() {
 const asyncState = ReactiveUtils.asyncState();
 
 effect(() => {
-  const errorBanner = document.querySelector('#error-banner');
+  const errorBanner = querySelector('#error-banner');
   
   if (asyncState.isError) {
     errorBanner.textContent = asyncState.error.message;
@@ -87,7 +87,7 @@ effect(() => {
 const asyncState = ReactiveUtils.asyncState();
 
 effect(() => {
-  const retryBtn = document.querySelector('#retry-btn');
+  const retryBtn = querySelector('#retry-btn');
   
   if (asyncState.isError) {
     retryBtn.style.display = 'block';
@@ -103,7 +103,7 @@ effect(() => {
 const asyncState = ReactiveUtils.asyncState();
 
 effect(() => {
-  const container = document.querySelector('#container');
+  const container = querySelector('#container');
   
   if (asyncState.isError) {
     container.classList.add('error-state');
