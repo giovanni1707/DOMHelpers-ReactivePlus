@@ -64,6 +64,7 @@ Briefly mention how this would look in plain JavaScript and explain why the DOM 
 By the end of the documentation:
 
 A reader should clearly see that:
+
 - Reactivity alone is powerful but
 - Reactivity + DOM Helpers Core (Core, Enhancers and Conditions) APIs feels like a lightweight framework
 - The reader should understand why these two libraries were designed to work together
@@ -180,6 +181,7 @@ Think of it as [real-world analogy]. [Expand on analogy with 2-3 sentences].
 [Show regular JavaScript first]
 
 **What's happening?**
+
 - [Bullet point explanation]
 - [Use everyday language]
 ```
@@ -218,14 +220,14 @@ At first glance, this looks fine. But there's a hidden limitation.
 
 ### 1. Method Naming Convention
 
-- Use **only non-`$` prefixed methods** in *all* documentation, explanations, examples, and comparisons.
+- Use **only non-`$` prefixed methods** in _all_ documentation, explanations, examples, and comparisons.
 - Do **not** mention or demonstrate `$`-prefixed methods.
 - Assume that the project uses `09_dh-reactive-namespace-methods.js`, which exposes the official public API.
 - Treat non-`$` methods as the **standard and final API** across the entire project.
 
 ### 2. Tone When Explaining "What Problem This Method Solves"
 
-- Never describe existing methods in the Reactive library as *bad*, *limited*, *wrong*, or *inferior*.
+- Never describe existing methods in the Reactive library as _bad_, _limited_, _wrong_, or _inferior_.
 - Avoid language that sounds like criticism, blame, or downgrade of any method.
 - Do **not** imply that older or alternative methods are mistakes.
 
@@ -297,6 +299,7 @@ At first glance, this looks fine. But there's a hidden limitation.
 ### 4. Explicit Mental Models:
 
 Create comparisons like:
+
 - "Regular Object (Dumb House)" vs "Reactive State (Smart House)"
 - Use boxes, arrows, and flow diagrams
 - Show what happens behind the scenes
@@ -382,3 +385,121 @@ Assuming that readers are beginners, some important keywords should be clearly e
 - [ ] Is there a memorable analogy or mental model?
 - [ ] Would someone know exactly how to use this after reading?
 - [ ] Is the tone encouraging and non-intimidating?
+
+
+---
+
+> Please **audit, correct, and update all previously generated files**, including **documentation, explanations, and code examples**.
+>
+> I noticed multiple violations of core project rules. These must be fixed **globally and consistently**.
+
+---
+
+## 🚫 **Critical API Restrictions (Non-Negotiable)**
+
+### 1️⃣ **No `$`-Prefixed Methods**
+
+* Use **only non-`$` prefixed methods** in **all** documentation, explanations, examples, and comparisons.
+* **Do NOT mention, reference, or demonstrate** `$`-prefixed methods — not even as notes, alternatives, or historical context.
+* Assume the project exclusively uses
+  **`08_dh-reactive-namespace-methods.js`**, which defines the **official public API**.
+* If a feature does not exist in the non-`$` API, **do not invent it**. Omit it or clearly explain that it does not exist.
+
+---
+
+## ✅ **Mandatory Global Shortcut Usage**
+
+When writing **any example, snippet, or explanation**, always prefer **global shortcut APIs** over verbose namespaces.
+
+### ✅ Selector & Collection Access
+
+❌ **Do NOT use**
+
+```js
+Collection.ClassName
+Collection.tagName
+Collection.Name
+```
+
+✅ **Use instead**
+
+```js
+ClassName
+tagName
+Name
+```
+
+---
+
+### ✅ Selector Usage
+
+❌ **Do NOT use**
+
+```js
+Selector.query()
+Selector.queryAll()
+```
+
+✅ **Use instead**
+
+```js
+querySelector()
+querySelectorAll()
+```
+
+---
+
+### 📌 **Shortcut Rules**
+
+* This rule must be applied **consistently across all files**.
+* The goal is **clean, concise, beginner-friendly code**.
+* Namespace-based APIs may be **mentioned once for learning purposes only**, but **must never be used in examples**.
+* **If a global shortcut exists, it must be used by default.**
+
+---
+
+## 🎯 **Required Coverage & Balance**
+
+I also noticed an **over-reliance on `Elements`** in examples.
+
+This must be corrected.
+
+### You must:
+
+* Actively demonstrate the power of:
+
+  * `ClassName`
+  * `tagName`
+  * `Name`
+  * `querySelector`
+  * `querySelectorAll`
+* Show **real usage**, not just mentions.
+
+### Especially important:
+
+* Demonstrate **bindings**, `updateAll`, `effect` and reactive updates using:
+  * `Elements`
+  * `ClassName`
+  * `tagName`
+  * `Name`
+  * `querySelectorAll`
+* Show how these shortcuts enable **batch updates, reactivity, and clean DOM bindings** more effectively than manual or verbose approaches.
+
+Examples should clearly communicate:
+
+* Why these shortcuts exist
+* How they scale better
+* Why they are central to the library’s design philosophy
+
+---
+
+## 🧠 **Final Expectations**
+
+* Re-check **every file and section** you generated.
+* Enforce **100% consistency** with all rules above.
+* Keep explanations **simple, beginner-friendly, and practical**.
+* Do not reintroduce forbidden APIs later in the document.
+* Remember: All documentation must be beginner-friendly first.
+This is a new library, so explanations should prioritize clarity, simple language, and approachability over advanced or abstract concepts.
+
+---
