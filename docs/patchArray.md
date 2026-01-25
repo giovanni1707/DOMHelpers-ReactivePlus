@@ -203,7 +203,7 @@ ReactiveUtils.effect(() => {
     </li>
   `).join('');
 
-  document.getElementById('todos').innerHTML = html;
+  querySelector('#todos').innerHTML = html;
 });
 
 // Add todo - UI updates automatically
@@ -234,8 +234,8 @@ ReactiveUtils.patchArray(cart, 'items');
 // Reactive cart display
 ReactiveUtils.effect(() => {
   const total = cart.items.reduce((sum, item) => sum + item.price, 0);
-  document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`;
-  document.getElementById('cartCount').textContent = cart.items.length;
+  querySelector('#cartTotal').textContent = `$${total.toFixed(2)}`;
+  querySelector('#cartCount').textContent = cart.items.length;
 });
 
 function addToCart(product) {

@@ -113,7 +113,7 @@ function mapEntries(obj, callback, joinHTMLOrSelector, selector) {
 
   // 5. Render to DOM if selector provided
   if (targetSelector) {
-    const element = document.querySelector(targetSelector);
+    const element = querySelector(targetSelector);
     if (element) {
       element.innerHTML = joinHTML ? output : output.join('');
     }
@@ -168,7 +168,7 @@ const html = mapEntries(product, (key, value) => {
 console.log(html);
 // "<li>name: Laptop</li><li>price: 999</li><li>stock: 5</li>"
 
-document.getElementById('product').innerHTML = `<ul>${html}</ul>`;
+querySelector('#product').innerHTML = `<ul>${html}</ul>`;
 ```
 
 ### **Example 3: Map and Render**
@@ -227,7 +227,7 @@ const html = mapEntries(tasks, (key, value, index) => {
   return `<p>${index + 1}. ${value}</p>`;
 }, true);
 
-document.getElementById('tasks').innerHTML = html;
+querySelector('#tasks').innerHTML = html;
 // <p>1. Write docs</p>
 // <p>2. Review code</p>
 // <p>3. Deploy app</p>
@@ -266,7 +266,7 @@ const options = mapEntries(countries, (code, name) => {
   return `<option value="${code}">${name}</option>`;
 }, true);
 
-document.getElementById('country').innerHTML = options;
+querySelector('#country').innerHTML = options;
 ```
 
 ### **Example 8: Stats Dashboard**
@@ -434,7 +434,7 @@ const html = mapEntries(obj, (key, value) => {
 const html = Object.entries(obj)
   .map(([key, value]) => `<div>${key}: ${value}</div>`)
   .join('');
-document.querySelector('#output').innerHTML = html;
+querySelector('#output').innerHTML = html;
 ```
 
 ---

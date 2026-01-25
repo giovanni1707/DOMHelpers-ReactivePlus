@@ -126,7 +126,7 @@ const storage = ReactiveUtils.reactiveStorage('localStorage', 'app');
 // Reactive counter
 ReactiveUtils.effect(() => {
   const keys = storage.keys();
-  document.getElementById('keyCount').textContent =
+  querySelector('#keyCount').textContent =
     `Storage has ${keys.length} keys`;
 });
 
@@ -154,7 +154,7 @@ ReactiveUtils.effect(() => {
     `;
   }).join('');
 
-  document.getElementById('settingsPanel').innerHTML = html;
+  querySelector('#settingsPanel').innerHTML = html;
 });
 
 // Add/remove settings - panel updates automatically
@@ -198,7 +198,7 @@ function exportData() {
   downloadFile('export.json', json);
 }
 
-document.getElementById('exportBtn').addEventListener('click', exportData);
+querySelector('#exportBtn').addEventListener('click', exportData);
 ```
 
 ### **Example 6: Search Keys**
@@ -266,7 +266,7 @@ ReactiveUtils.effect(() => {
     `;
   }).join('');
 
-  document.getElementById('storageTable').innerHTML = `
+  querySelector('#storageTable').innerHTML = `
     <table>
       <thead>
         <tr>
@@ -307,7 +307,7 @@ ReactiveUtils.effect(() => {
   const taskKeys = tasks.keys();
 
   if (taskKeys.length === 0) {
-    document.getElementById('tasks').innerHTML =
+    querySelector('#tasks').innerHTML =
       '<p>No tasks yet. Add one!</p>';
     return;
   }
@@ -323,7 +323,7 @@ ReactiveUtils.effect(() => {
     `;
   }).join('');
 
-  document.getElementById('tasks').innerHTML = html;
+  querySelector('#tasks').innerHTML = html;
 });
 
 function addTask(title, description) {

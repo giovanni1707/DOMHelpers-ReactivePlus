@@ -930,3 +930,187 @@ ReactiveUtils.autoSave(appState, 'appState', {
 ## **Summary**
 
 The `autoSave()` function accepts an options object with 11 configuration options that control storage behavior, performance, data transformation, and event handling. Use `storage` to choose between localStorage and sessionStorage, `namespace` to organize keys and prevent collisions, `debounce` to optimize performance during rapid changes, `autoLoad` and `autoSave` to control automatic behavior, `sync` for cross-tab synchronization, `expires` for time-based data expiration, `onSave` and `onLoad` for data transformation and validation, `onSync` to respond to cross-tab updates, and `onError` for robust error handling. These options provide fine-grained control over how reactive state is persisted to browser storage, making it easy to implement user preferences, form auto-save, caching, cross-tab communication, and more with just a few configuration options.
+
+---
+
+## **Advanced: autoSave with Global Shortcuts**
+
+Combining `autoSave()` with global DOM shortcuts creates powerful reactive applications.
+
+### **Example: Theme System with ClassName**
+```javascript
+const appState = ReactiveUtils.state({
+  theme: 'light',
+  accentColor: 'blue',
+  fontSize: 14
+});
+
+// Auto-save with persistence
+ReactiveUtils.autoSave(appState, 'appState', {
+  storage: 'localStorage',
+  namespace: 'myApp'
+});
+
+// Reactive UI - automatically syncs on ANY state change
+ReactiveUtils.effect(() => {
+  // Update ALL themed elements at once
+  ClassName('themed').updateAll(el => {
+    el.dataset.theme = appState.theme;
+    el.dataset.accent = appState.accentColor;
+    el.style.fontSize = appState.fontSize + 'px';
+  });
+});
+
+// Change state - saves AND updates UI
+appState.theme = 'dark';  // Saves to localStorage + UI updates
+appState.fontSize = 16;   // Saves to localStorage + UI updates
+```
+
+**Benefits:**
+- State changes auto-save to storage
+- UI auto-updates via effect
+- `ClassName()` updates all matching elements
+- Zero manual DOM manipulation
+
+### **Example: Form Auto-Save with Name**
+```javascript
+const formState = ReactiveUtils.state({
+  title: '',
+  content: '',
+  tags: [],
+  published: false
+});
+
+// Auto-save form drafts
+ReactiveUtils.autoSave(formState, 'postDraft', {
+  storage: 'sessionStorage',
+  debounce: 500,  // Save 500ms after last change
+  onSave: (value) => {
+    console.log('Draft saved:', new Date().toLocaleTimeString());
+    return value;
+  }
+});
+
+// Bind form fields to state
+querySelectorAll('[name]').forEach(field => {
+  field.addEventListener('input', () => {
+    const name = field.name;
+    const value = field.type === 'checkbox' ? field.checked : field.value;
+    formState[name] = value;
+    // Automatically saves after 500ms (debounced)
+  });
+});
+
+// Restore from storage on load
+ReactiveUtils.effect(() => {
+  Object.entries(formState).forEach(([name, value]) => {
+    Name(name).updateAll(field => {
+      if (field.type === 'checkbox') {
+        field.checked = value;
+      } else {
+        field.value = value;
+      }
+    });
+  });
+});
+```
+
+**Why this scales:**
+- Works with ANY form size
+- `Name()` handles multiple fields (radios, checkboxes)
+- Debounced saves prevent excessive writes
+- Auto-restores on page load
+
+### **Example: Dashboard with tagName**
+```javascript
+const dashboard = ReactiveUtils.state({
+  metrics: {
+    users: 0,
+    posts: 0,
+    revenue: 0
+  },
+  lastUpdate: null
+});
+
+// Persist dashboard state
+ReactiveUtils.autoSave(dashboard, 'dashboardState', {
+  storage: 'localStorage',
+  namespace: 'analytics',
+  onSave: (value) => {
+    value.lastUpdate = Date.now();
+    return value;
+  }
+});
+
+// Update all metric outputs
+ReactiveUtils.effect(() => {
+  tagName('output').updateAll(el => {
+    const metric = el.dataset.metric;
+    if (metric && dashboard.metrics[metric] !== undefined) {
+      el.textContent = dashboard.metrics[metric].toLocaleString();
+    }
+  });
+});
+
+// Update metrics - saves automatically + UI updates
+dashboard.metrics.users = 1234;
+dashboard.metrics.posts = 5678;
+// All <output> elements update + state saves to localStorage
+```
+
+### **Example: Settings Panel with querySelectorAll**
+```javascript
+const settings = ReactiveUtils.state({
+  notifications: true,
+  autoSave: true,
+  darkMode: false,
+  language: 'en'
+});
+
+// Persist settings
+ReactiveUtils.autoSave(settings, 'userSettings', {
+  storage: 'localStorage',
+  immediate: true  // Apply saved settings on load
+});
+
+// Sync all setting controls
+ReactiveUtils.effect(() => {
+  querySelectorAll('[data-setting]').forEach(control => {
+    const setting = control.dataset.setting;
+    const value = settings[setting];
+
+    if (control.type === 'checkbox') {
+      control.checked = value;
+    } else if (control.tagName === 'SELECT') {
+      control.value = value;
+    } else {
+      control.value = value;
+    }
+  });
+
+  // Apply settings to UI
+  ClassName('app-container').updateAll(el => {
+    el.classList.toggle('dark-mode', settings.darkMode);
+  });
+});
+
+// Update on user interaction
+querySelectorAll('[data-setting]').forEach(control => {
+  control.addEventListener('change', () => {
+    const setting = control.dataset.setting;
+    const value = control.type === 'checkbox' ? control.checked : control.value;
+    settings[setting] = value;
+    // Auto-saves + triggers effect + UI updates
+  });
+});
+```
+
+**The complete flow:**
+1. User changes setting control
+2. State updates
+3. `autoSave()` persists to localStorage
+4. Effect runs
+5. `querySelectorAll()` updates all controls
+6. `ClassName()` applies theme changes
+7. Everything stays synchronized
+
