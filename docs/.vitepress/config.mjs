@@ -378,7 +378,7 @@ export default defineConfig({
     nav: [
       {
         text: "Getting Started",
-        link: "/getting-started/what-is-dom-helpers-reactive",
+        link: "/getting-started/what-is-core-reactive",
       },
       { text: "Fundamentals", link: "/reactive-state/state" },
       // UPDATED: Created a dropdown for Collection, Form, Async, and Storage
