@@ -449,6 +449,7 @@ export default defineConfig({
           ],
         },
 
+        { text: "DOM Helpers Reactive", link: "https://example" },
         { text: "DOM Helpers Core", link: "https://example" },
 
         {
