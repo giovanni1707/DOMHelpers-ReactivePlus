@@ -556,188 +556,261 @@ localStorage.setItem('user', JSON.stringify({ name: 'John' }));
 
 ## **Advanced: Reactive Bindings with Global Shortcuts**
 
-These examples demonstrate the power of combining reactive storage with global DOM shortcuts (`ClassName`, `tagName`, `Name`, `querySelectorAll`) for clean, scalable reactive UIs.
+These examples demonstrate the power of combining reactive storage with **Elements** (ID access), **bindings()** (declarative DOM sync), **ClassName auto-iteration** (no forEach), and **conditions** (reactive rendering).
 
-### **Example: Batch Updates with ClassName**
+### **Example: Elements + bindings() - Declarative Sync**
 ```javascript
 const storage = ReactiveUtils.reactiveStorage('localStorage', 'ui');
 
-// Set theme - automatically updates ALL elements with class
+// Set theme
 storage.set('theme', 'dark');
+storage.set('fontSize', 16);
 
-ReactiveUtils.effect(() => {
-  const theme = storage.get('theme');
+// Declarative bindings - automatically sync storage to DOM
+bindings({
+  // Elements: ID-based access (fastest)
+  '#themeDisplay': () => storage.get('theme'),
+  '#fontSizeValue': () => storage.get('fontSize') + 'px',
 
-  // Update all .theme-aware elements at once
-  ClassName('theme-aware').updateAll(el => {
-    el.dataset.theme = theme;
-    el.classList.toggle('dark-mode', theme === 'dark');
-    el.classList.toggle('light-mode', theme === 'light');
-  });
+  // Elements with multiple properties
+  '#statusBar': {
+    textContent: () => `Theme: ${storage.get('theme')}`,
+    className: () => `status ${storage.get('theme')}-mode`
+  }
 });
 
-// Change theme - all .theme-aware elements update instantly
-storage.set('theme', 'light');
+// Change storage - bindings update automatically
+storage.set('theme', 'light');  // #themeDisplay shows "light"
+storage.set('fontSize', 18);     // #fontSizeValue shows "18px"
 ```
 
 **Why this is powerful:**
-- `ClassName()` selects ALL matching elements
-- `updateAll()` applies changes to all at once
-- Changing storage triggers ONE effect that updates EVERYTHING
-- No manual loops, no getElementById for each element
+- **Elements** (via `#id`) = Fast, direct access by ID
+- **bindings()** = Declarative, no manual effects
+- Storage changes → UI updates automatically
+- No manual querySelector or updateAll needed
 
-### **Example: Reactive Forms with Name**
+### **Example: ClassName Auto-Iteration + Array-Based Updates**
 ```javascript
-const formData = ReactiveUtils.reactiveStorage('sessionStorage', 'form');
+const storage = ReactiveUtils.reactiveStorage('localStorage', 'items');
 
-// Restore all form fields by name
-ReactiveUtils.effect(() => {
-  const savedData = formData.get('draft');
-  if (!savedData) return;
-
-  // Restore all fields using Name shortcut
-  Object.entries(savedData).forEach(([name, value]) => {
-    Name(name).updateAll(field => {
-      if (field.type === 'checkbox') {
-        field.checked = value;
-      } else {
-        field.value = value;
-      }
-    });
-  });
-});
-
-// Auto-save on any input change
-querySelectorAll('input, textarea, select').forEach(field => {
-  field.addEventListener('input', () => {
-    const draft = {};
-    querySelectorAll('[name]').forEach(f => {
-      draft[f.name] = f.type === 'checkbox' ? f.checked : f.value;
-    });
-    formData.set('draft', draft);
-  });
-});
-```
-
-**Why this scales:**
-- `Name()` finds all fields with same name (radio buttons, etc.)
-- Works with any form size
-- Single effect handles all restorations
-- No hardcoded IDs
-
-### **Example: Live Stats with tagName**
-```javascript
-const stats = ReactiveUtils.reactiveStorage('localStorage', 'analytics');
-
-// Update all stat displays
-ReactiveUtils.effect(() => {
-  const data = stats.get('metrics') || {};
-
-  // Update all <output> elements showing stats
-  tagName('output').updateAll(el => {
-    const metric = el.dataset.metric;
-    if (metric && data[metric]) {
-      el.textContent = data[metric].toLocaleString();
-    }
-  });
-});
-
-// Update stats
-stats.set('metrics', {
-  users: 1234,
-  posts: 5678,
-  views: 98765
-});
-
-// HTML:
-// <output data-metric="users"></output>
-// <output data-metric="posts"></output>
-// <output data-metric="views"></output>
-```
-
-**Why this is elegant:**
-- `tagName('output')` selects all output elements
-- `data-metric` attribute links element to data
-- One effect updates all metrics
-- Add more `<output>` elements, they work automatically
-
-### **Example: Multi-Section Updates**
-```javascript
-const settings = ReactiveUtils.reactiveStorage('localStorage', 'prefs');
-
-// Initialize
-settings.set('fontSize', 16);
-settings.set('theme', 'dark');
-settings.set('language', 'en');
-
-// Update all sections reactively
-ReactiveUtils.effect(() => {
-  const fontSize = settings.get('fontSize');
-  const theme = settings.get('theme');
-  const language = settings.get('language');
-
-  // Update all .font-size-aware elements
-  ClassName('font-size-aware').updateAll(el => {
-    el.style.fontSize = fontSize + 'px';
-  });
-
-  // Update all .theme-aware elements
-  ClassName('theme-aware').updateAll(el => {
-    el.dataset.theme = theme;
-  });
-
-  // Update all language displays
-  ClassName('lang-display').updateAll(el => {
-    el.textContent = language;
-  });
-});
-
-// Change any setting - all related elements update
-settings.set('fontSize', 18);  // All .font-size-aware update
-settings.set('theme', 'light'); // All .theme-aware update
-```
-
-**The power of this approach:**
-- Class-based targeting (semantic, reusable)
-- One effect per setting type
-- Scales to any number of elements
-- Zero hardcoded IDs or selectors
-
-### **Example: Reactive Dashboard**
-```javascript
-const dashboard = ReactiveUtils.reactiveStorage('localStorage', 'dashboard');
-
-// Set data
-dashboard.set('widgets', [
-  { id: 'sales', value: 45000, trend: '+12%' },
-  { id: 'users', value: 1234, trend: '+5%' },
-  { id: 'revenue', value: 98000, trend: '+8%' }
+// Set array data
+storage.set('products', [
+  { name: 'Product A', price: 29.99 },
+  { name: 'Product B', price: 39.99 },
+  { name: 'Product C', price: 49.99 }
 ]);
 
 ReactiveUtils.effect(() => {
-  const widgets = dashboard.get('widgets') || [];
+  const products = storage.get('products') || [];
 
-  widgets.forEach(widget => {
-    // Update each widget using ClassName
-    ClassName(`widget-${widget.id}`).updateAll(el => {
-      querySelector('.value', el).textContent = widget.value.toLocaleString();
-      querySelector('.trend', el).textContent = widget.trend;
-      querySelector('.trend', el).classList.toggle('positive', widget.trend.startsWith('+'));
-    });
+  // Array-based update - NO forEach needed!
+  // ClassName automatically distributes array values to matching elements
+  ClassName('product-name').update({
+    textContent: products.map(p => p.name)  // ['Product A', 'Product B', 'Product C']
+  });
+
+  ClassName('product-price').update({
+    textContent: products.map(p => `$${p.price}`)
   });
 });
 
-// Update one widget - only that widget's UI updates
-const currentWidgets = dashboard.get('widgets');
-currentWidgets[0].value = 50000;
-currentWidgets[0].trend = '+18%';
-dashboard.set('widgets', currentWidgets);
+// Index access (enhanced with Proxy)
+ClassName('product-card')[0]    // First product card
+ClassName('product-card')[1]    // Second product card
+ClassName('product-card')[-1]   // Last product card
+
+// Update one product - all cards update automatically
+const products = storage.get('products');
+products[0].price = 24.99;
+storage.set('products', products);
 ```
 
-**Key benefits:**
-- Widget-based architecture
-- Each widget updates independently
-- Using `ClassName()` for scoped selection
-- Nested `querySelector()` for widget internals
-- Declarative and maintainable
+**Why this is elegant:**
+- **No forEach** - ClassName auto-iterates
+- **Array-based updates** - Maps array values to elements
+- **Index access** - Direct element access with `[0]`, `[-1]`
+- Changing storage updates all cards at once
+
+### **Example: Conditions + whenState - Reactive Class Rendering**
+```javascript
+const storage = ReactiveUtils.reactiveStorage('localStorage', 'app');
+
+// Set initial state
+storage.set('status', 'loading');
+storage.set('userLevel', 5);
+
+// Reactive conditions - apply classes based on storage values
+ReactiveUtils.effect(() => {
+  const status = storage.get('status');
+  const level = storage.get('userLevel');
+
+  // Pattern matching on status
+  whenState(status, {
+    'loading': 'spinner-active',
+    'success': 'status-success',
+    'error': 'status-error'
+  }, '#statusIndicator');
+
+  // Numeric range matching
+  whenState(level, {
+    '0-3': 'level-beginner',
+    '4-7': 'level-intermediate',
+    '8-10': 'level-expert'
+  }, '#userBadge');
+});
+
+// Update storage - conditions apply automatically
+storage.set('status', 'success');  // #statusIndicator gets .status-success
+storage.set('userLevel', 8);       // #userBadge gets .level-expert
+```
+
+**Why conditions are powerful:**
+- **Pattern matching** - No manual if/else chains
+- **Declarative** - Define what, not how
+- **Reactive** - Updates automatically on storage changes
+- **Flexible** - Supports strings, numbers, ranges, regex
+
+### **Example: updateAll() + Computed - Mixed State & DOM Updates**
+```javascript
+const storage = ReactiveUtils.reactiveStorage('localStorage', 'dashboard');
+const appState = ReactiveUtils.state({
+  counter: 0,
+  lastUpdate: null
+});
+
+// Add computed property
+appState.$computed('display', function() {
+  return `Count: ${this.counter} (Updated: ${this.lastUpdate || 'Never'})`;
+});
+
+// Set storage
+storage.set('theme', 'dark');
+storage.set('notifications', 5);
+
+// updateAll() - Update BOTH storage AND DOM in one call
+function updateDashboard() {
+  updateAll({
+    // Update storage
+    theme: 'light',
+    notifications: 3,
+
+    // Update DOM directly
+    '#dashboard': {
+      className: 'dashboard light-mode',
+      dataset: { theme: 'light' }
+    },
+
+    // Update with Elements (ID-based)
+    '#counter': { textContent: appState.counter },
+    '#display': { textContent: appState.display }  // Uses computed
+  });
+}
+
+// Bindings for automatic sync
+bindings({
+  '#notifications': () => storage.get('notifications') || 0,
+  '#theme': () => storage.get('theme'),
+  '#computed': () => appState.display  // Computed property
+});
+
+// Increment counter
+appState.counter++;
+appState.lastUpdate = new Date().toLocaleTimeString();
+```
+
+**The power of this approach:**
+- **updateAll()** - Mixed storage + DOM updates
+- **Computed properties** - Derived values with `$computed()`
+- **bindings()** - Declarative DOM sync
+- **Elements** - Fast ID-based access
+- Everything stays in sync automatically
+
+### **Example: Full Reactive System - Storage + State + Collections + Bindings**
+```javascript
+const storage = ReactiveUtils.reactiveStorage('localStorage', 'app');
+
+// Reactive collections for array data
+const todos = ReactiveUtils.collection([]);
+
+// Reactive state for app data
+const appState = ReactiveUtils.state({
+  filter: 'all',
+  theme: 'light'
+});
+
+// Load todos from storage
+const savedTodos = storage.get('todos') || [];
+savedTodos.forEach(todo => todos.add(todo));
+
+// Watch collection changes - auto-save to storage
+ReactiveUtils.watch(todos, () => {
+  storage.set('todos', todos.items);
+});
+
+// Declarative bindings
+bindings({
+  // Elements - ID-based (fastest)
+  '#todoCount': () => todos.length,
+  '#activeCount': () => todos.filter(t => !t.done).length,
+
+  // Computed display
+  '#filterStatus': () => `Showing: ${appState.filter}`,
+
+  // Theme indicator
+  '#themeDisplay': () => appState.theme
+});
+
+// Conditions - reactive class application
+ReactiveUtils.effect(() => {
+  whenState(appState.theme, {
+    'light': 'theme-light',
+    'dark': 'theme-dark'
+  }, 'body');
+
+  whenState(todos.length, {
+    '0': 'empty-state',
+    '1-5': 'few-items',
+    '>5': 'many-items'
+  }, '#todoList');
+});
+
+// Render todos with ClassName array-based updates
+ReactiveUtils.effect(() => {
+  const filtered = todos.filter(t => {
+    if (appState.filter === 'active') return !t.done;
+    if (appState.filter === 'completed') return t.done;
+    return true;
+  });
+
+  // Array-based update - NO forEach!
+  ClassName('todo-item').update({
+    textContent: filtered.map(t => t.text),
+    dataset: { id: filtered.map(t => t.id) }
+  });
+});
+
+// Add todo
+function addTodo(text) {
+  todos.add({ id: Date.now(), text, done: false });
+  // Collection watch auto-saves to storage
+}
+
+// Toggle theme
+function toggleTheme() {
+  appState.theme = appState.theme === 'light' ? 'dark' : 'light';
+  storage.set('theme', appState.theme);  // Persist theme
+}
+```
+
+**The complete reactive system:**
+- **Storage** - Persistent reactive data (localStorage/sessionStorage)
+- **Collections** - Reactive arrays with `.add()`, `.remove()`, `.filter()`
+- **State** - Reactive objects with computed properties
+- **bindings()** - Declarative DOM synchronization
+- **whenState** - Conditional rendering with pattern matching
+- **Elements** - Fast ID-based DOM access
+- **ClassName** - Auto-iteration with array-based updates
+- **watch** - React to changes (auto-save to storage)
+- Everything updates automatically when data changes!
 

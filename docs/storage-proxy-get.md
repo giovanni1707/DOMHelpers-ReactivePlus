@@ -562,110 +562,235 @@ const user = userStr ? JSON.parse(userStr) : null;
 
 ---
 
-## **Advanced: Reactive UI with Global Shortcuts**
+## **Advanced: Full Library Features with Reactive Storage**
 
-Combining `proxy.get()` with global shortcuts creates powerful reactive patterns.
+Combining `proxy.get()` with **Elements** (ID access), **bindings()** (declarative sync), **ClassName auto-iteration**, and **conditions** creates a complete reactive system.
 
-### **Example: Auto-Sync UI with ClassName**
+### **Example: Elements + bindings() - Declarative Storage Sync**
 ```javascript
-const prefs = ReactiveUtils.reactiveStorage('localStorage', 'prefs');
+const storage = ReactiveUtils.reactiveStorage('localStorage', 'user');
 
-// Initialize preferences
-prefs.set('darkMode', true);
-prefs.set('compactView', false);
-prefs.set('showSidebar', true);
+// Set user data
+storage.set('username', 'alice');
+storage.set('email', 'alice@example.com');
+storage.set('credits', 150);
+storage.set('status', 'premium');
 
-// Reactive UI sync - runs on any preference change
-ReactiveUtils.effect(() => {
-  const darkMode = prefs.get('darkMode');
-  const compactView = prefs.get('compactView');
-  const showSidebar = prefs.get('showSidebar');
+// Declarative bindings - Elements (ID-based, fastest)
+bindings({
+  '#username': () => storage.get('username'),
+  '#email': () => storage.get('email'),
+  '#credits': () => storage.get('credits') + ' credits',
 
-  // Update all layout containers
-  ClassName('layout-container').updateAll(el => {
-    el.classList.toggle('dark-mode', darkMode);
-    el.classList.toggle('compact', compactView);
-    el.classList.toggle('sidebar-visible', showSidebar);
-  });
-
-  // Update all preference displays
-  ClassName('pref-display').updateAll(el => {
-    const pref = el.dataset.pref;
-    el.textContent = prefs.get(pref);
-  });
+  // Multiple properties
+  '#statusBadge': {
+    textContent: () => storage.get('status'),
+    className: () => `badge ${storage.get('status')}`
+  }
 });
 
-// Toggle preference - entire UI updates automatically
-prefs.set('darkMode', !prefs.get('darkMode'));
-```
-
-### **Example: Form Field Sync with Name**
-```javascript
-const userData = ReactiveUtils.reactiveStorage('localStorage', 'user');
-
-// Load user data
-userData.set('profile', {
-  username: 'alice',
-  email: 'alice@example.com',
-  bio: 'Software developer'
-});
-
-// Sync all form fields reactively
-ReactiveUtils.effect(() => {
-  const profile = userData.get('profile');
-  if (!profile) return;
-
-  // Populate all fields by name
-  Object.entries(profile).forEach(([fieldName, value]) => {
-    Name(fieldName).updateAll(field => {
-      field.value = value;
-    });
-  });
-});
-
-// Update profile - all fields update across all forms
-const profile = userData.get('profile');
-profile.username = 'alice_updated';
-userData.set('profile', profile);
-```
-
-### **Example: Multi-Tab Reactive Updates**
-```javascript
-const notifications = ReactiveUtils.reactiveStorage('localStorage', 'notifications');
-
-// Effect runs in ALL open tabs
-ReactiveUtils.effect(() => {
-  const unread = notifications.get('unread') || [];
-  const count = unread.length;
-
-  // Update all notification badges
-  ClassName('notification-badge').updateAll(badge => {
-    badge.textContent = count;
-    badge.style.display = count > 0 ? 'inline-block' : 'none';
-    badge.classList.toggle('has-notifications', count > 0);
-  });
-
-  // Update all notification lists
-  ClassName('notification-list').updateAll(list => {
-    list.innerHTML = unread.map(notif => `
-      <li class="notification-item">
-        <strong>${notif.title}</strong>
-        <p>${notif.message}</p>
-      </li>
-    `).join('');
-  });
-});
-
-// Add notification in Tab 1
-const unread = notifications.get('unread') || [];
-unread.push({ title: 'New Message', message: 'You have mail!' });
-notifications.set('unread', unread);
-// Tab 2 UI updates automatically!
+// Update storage - UI updates automatically
+storage.set('credits', 200);  // #credits shows "200 credits"
+storage.set('status', 'vip'); // #statusBadge updates class and text
 ```
 
 **Why this is powerful:**
-- Cross-tab reactivity built-in
-- `ClassName()` updates all badges in all tabs
-- Single source of truth (storage)
-- No manual polling or postMessage needed
+- **Elements** via `#id` = Fast, direct ID access
+- **bindings()** = Declarative, no manual effects
+- Storage changes = Automatic UI updates
+- Clean, maintainable code
+
+### **Example: ClassName Array-Based Updates - No forEach!**
+```javascript
+const storage = ReactiveUtils.reactiveStorage('localStorage', 'leaderboard');
+
+// Set leaderboard data
+storage.set('players', [
+  { name: 'Alice', score: 9500, rank: 1 },
+  { name: 'Bob', score: 8200, rank: 2 },
+  { name: 'Charlie', score: 7800, rank: 3 }
+]);
+
+ReactiveUtils.effect(() => {
+  const players = storage.get('players') || [];
+
+  // Array-based update - ClassName auto-distributes, NO forEach!
+  ClassName('player-name').update({
+    textContent: players.map(p => p.name)
+  });
+
+  ClassName('player-score').update({
+    textContent: players.map(p => p.score.toLocaleString())
+  });
+
+  ClassName('player-rank').update({
+    textContent: players.map(p => `#${p.rank}`)
+  });
+});
+
+// Index access (Proxy-enhanced)
+ClassName('player-row')[0]    // First player
+ClassName('player-row')[1]    // Second player
+ClassName('player-row')[-1]   // Last player
+
+// Update leaderboard - all rows update automatically
+const players = storage.get('players');
+players[0].score = 10000;
+storage.set('players', players);
+```
+
+**Why this is elegant:**
+- **No forEach** - ClassName auto-iterates
+- **Array-based updates** - Direct mapping to elements
+- **Index access** - Easy element selection
+- Scales to any number of elements
+
+### **Example: Conditions + whenState - Reactive Class Application**
+```javascript
+const storage = ReactiveUtils.reactiveStorage('localStorage', 'app');
+
+// Set application state
+storage.set('connectionStatus', 'connected');
+storage.set('userLevel', 7);
+storage.set('notificationCount', 3);
+
+// Reactive conditions - pattern matching
+ReactiveUtils.effect(() => {
+  const status = storage.get('connectionStatus');
+  const level = storage.get('userLevel');
+  const notifications = storage.get('notificationCount');
+
+  // String pattern matching
+  whenState(status, {
+    'connected': 'status-online',
+    'connecting': 'status-connecting',
+    'disconnected': 'status-offline'
+  }, '#connectionIndicator');
+
+  // Numeric range matching
+  whenState(level, {
+    '0-3': 'level-beginner',
+    '4-7': 'level-intermediate',
+    '8-10': 'level-expert'
+  }, '#userBadge');
+
+  // Conditional visibility
+  whenState(notifications, {
+    '0': 'hidden',
+    '>0': 'visible'
+  }, '#notificationIcon');
+});
+
+// Update storage - conditions apply automatically
+storage.set('connectionStatus', 'disconnected');  // #connectionIndicator gets .status-offline
+storage.set('userLevel', 9);                      // #userBadge gets .level-expert
+storage.set('notificationCount', 5);              // #notificationIcon gets .visible
+```
+
+**Why conditions are powerful:**
+- **Pattern matching** - No if/else chains
+- **Declarative** - Define rules, not logic
+- **Reactive** - Automatic updates
+- **Flexible** - Strings, numbers, ranges, regex
+
+### **Example: Complete Reactive System - Storage + State + Collections**
+```javascript
+const storage = ReactiveUtils.reactiveStorage('localStorage', 'dashboard');
+
+// Reactive state
+const appState = ReactiveUtils.state({
+  viewMode: 'grid',
+  sortBy: 'date'
+});
+
+// Reactive collections for dynamic lists
+const tasks = ReactiveUtils.collection([]);
+
+// Load tasks from storage
+const savedTasks = storage.get('tasks') || [];
+savedTasks.forEach(task => tasks.add(task));
+
+// Watch collection - auto-save to storage
+ReactiveUtils.watch(tasks, () => {
+  storage.set('tasks', tasks.items);
+});
+
+// Computed property
+appState.$computed('taskCount', function() {
+  return tasks.length;
+});
+
+// Declarative bindings
+bindings({
+  // Elements - ID-based access
+  '#taskCount': () => appState.taskCount,
+  '#completedCount': () => tasks.filter(t => t.done).length,
+  '#viewMode': () => appState.viewMode,
+
+  // Computed display
+  '#statusDisplay': () => {
+    const total = tasks.length;
+    const done = tasks.filter(t => t.done).length;
+    return `${done} of ${total} completed`;
+  }
+});
+
+// Conditions for view modes
+ReactiveUtils.effect(() => {
+  whenState(appState.viewMode, {
+    'grid': 'view-grid',
+    'list': 'view-list',
+    'kanban': 'view-kanban'
+  }, '#taskContainer');
+
+  whenState(tasks.length, {
+    '0': 'empty-state',
+    '1-5': 'few-tasks',
+    '>5': 'many-tasks'
+  }, '#dashboard');
+});
+
+// Render tasks with array-based updates
+ReactiveUtils.effect(() => {
+  const filtered = tasks.filter(t => !t.done);
+  const sorted = filtered.sort((a, b) => {
+    if (appState.sortBy === 'date') return b.created - a.created;
+    return a.title.localeCompare(b.title);
+  });
+
+  // Array-based update - NO forEach!
+  ClassName('task-item').update({
+    textContent: sorted.map(t => t.title),
+    dataset: { id: sorted.map(t => t.id) }
+  });
+});
+
+// Add task - collection watch auto-saves to storage
+function addTask(title) {
+  tasks.add({
+    id: Date.now(),
+    title,
+    done: false,
+    created: Date.now()
+  });
+  // Auto-saved via watch()
+}
+
+// Toggle view mode - stored and UI updates
+function setViewMode(mode) {
+  appState.viewMode = mode;
+  storage.set('viewMode', mode);  // Persist preference
+}
+```
+
+**The complete reactive ecosystem:**
+- **Storage** - Persistent data (localStorage/sessionStorage)
+- **State** - Reactive objects with `$computed()` properties
+- **Collections** - Reactive arrays with `.add()`, `.remove()`, `.filter()`
+- **bindings()** - Declarative DOM synchronization
+- **whenState** - Conditional rendering
+- **Elements** - Fast ID-based DOM access
+- **ClassName** - Auto-iteration with array updates
+- **watch** - React to changes (auto-save)
+- Everything updates automatically!
 

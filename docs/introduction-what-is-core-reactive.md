@@ -105,7 +105,8 @@ querySelector('#app')
 querySelectorAll('.items')
 
 // ✅ Even more powerful shortcuts
-ClassName('button')    // Select by class
+Elements.myButton      // Select by ID (fastest, cached)
+ClassName('button')    // Select by class (auto-iterates)
 tagName('div')         // Select by tag
 Name('email')          // Select by name attribute
 ```
@@ -114,7 +115,8 @@ Name('email')          // Select by name attribute
 - Shorter, cleaner code
 - Beginner-friendly
 - More semantic and readable
-- Built-in batch operations
+- **Elements** = ID access with caching
+- **ClassName** = Auto-iteration, no forEach needed
 
 ---
 
@@ -129,53 +131,78 @@ const user = ReactiveUtils.state({
   online: true
 });
 
-// Reactive bindings - UI updates automatically
-ClassName('user-name').bind({
-  textContent: () => user.name
-});
+// bindings() - Declarative DOM synchronization
+bindings({
+  // Elements - ID-based (fastest)
+  '#userName': () => user.name,
+  '#userAge': () => user.age + ' years old',
 
-ClassName('user-status').bind({
-  textContent: () => user.online ? 'Online' : 'Offline',
-  'class.online': () => user.online
+  // Multiple properties
+  '#userStatus': {
+    textContent: () => user.online ? 'Online' : 'Offline',
+    className: () => user.online ? 'status online' : 'status offline'
+  }
 });
 
 // Change state - UI updates automatically
-user.name = 'Bob';    // All .user-name elements update
-user.online = false;  // All .user-status elements update
+user.name = 'Bob';    // #userName updates
+user.online = false;  // #userStatus updates text and class
 ```
 
 **Why this matters:**
-- Declarative, not imperative
+- **bindings()** = Declarative function
+- **Elements** via `#id` = Fast ID-based access
 - Write what you want, not how to do it
-- One binding works for unlimited elements
+- One binding definition, automatic updates
 - Zero manual DOM updates
 
 ---
 
 ### **3. Conditions: Reactive Rendering**
 
-Show/hide content based on state:
+Apply classes based on state with pattern matching:
 
 ```javascript
 const state = ReactiveUtils.state({
-  isLoggedIn: false,
-  showMenu: true
+  status: 'offline',
+  userLevel: 5,
+  notifications: 0
 });
 
-// Conditional rendering integrated
-ClassName('logged-in-content').condition(() => state.isLoggedIn);
-ClassName('menu').condition(() => state.showMenu);
+// whenState - Reactive conditions with pattern matching
+ReactiveUtils.effect(() => {
+  // String pattern matching
+  whenState(state.status, {
+    'online': 'status-online',
+    'offline': 'status-offline',
+    'away': 'status-away'
+  }, '#connectionStatus');
 
-// Change state - visibility updates automatically
-state.isLoggedIn = true;  // .logged-in-content appears
-state.showMenu = false;   // .menu hides
+  // Numeric range matching
+  whenState(state.userLevel, {
+    '0-3': 'level-beginner',
+    '4-7': 'level-intermediate',
+    '8-10': 'level-expert'
+  }, '#userBadge');
+
+  // Visibility conditions
+  whenState(state.notifications, {
+    '0': 'hidden',
+    '>0': 'visible'
+  }, '#notificationIcon');
+});
+
+// Change state - conditions apply automatically
+state.status = 'online';      // #connectionStatus gets .status-online
+state.userLevel = 8;          // #userBadge gets .level-expert
+state.notifications = 3;      // #notificationIcon gets .visible
 ```
 
 **Why this matters:**
-- No manual show/hide logic
-- Reactive visibility
+- **whenState** = Pattern matching, no if/else
+- Declarative condition rules
+- Supports strings, numbers, ranges, regex
 - Clean and maintainable
-- Works with any number of elements
 
 ---
 
@@ -238,28 +265,36 @@ const user = ReactiveUtils.state({
   premium: false
 });
 
-// Declarative bindings
-ClassName('user-name').bind({
-  textContent: () => user.name
+// bindings() - Declarative DOM synchronization
+bindings({
+  // Elements - ID-based access (fastest)
+  '#userName': () => user.name,
+  '#userEmail': () => user.email,
+
+  // Multiple properties
+  '#premiumBadge': {
+    textContent: () => user.premium ? 'Premium' : '',
+    style: {
+      display: () => user.premium ? 'inline' : 'none'
+    }
+  }
 });
 
-ClassName('user-email').bind({
-  textContent: () => user.email
-});
-
-ClassName('premium-badge').condition(() => user.premium);
-
-ClassName('user-container').bind({
-  'class.premium-user': () => user.premium
+// whenState - Conditional class application
+ReactiveUtils.effect(() => {
+  whenState(user.premium, {
+    true: 'premium-user',
+    false: ''
+  }, '.user-container');
 });
 ```
 
 **Benefits:**
-- Clean and readable
-- Declarative intent
-- No manual loops
-- No manual visibility logic
-- Easy to maintain
+- **bindings()** = Declarative synchronization
+- **Elements** via `#id` = Fast, cached access
+- **whenState** = Pattern-based conditions
+- No manual loops or visibility logic
+- Clean, readable, maintainable
 - Scales automatically
 
 ---
@@ -271,8 +306,8 @@ ClassName('user-container').bind({
 | **Reactivity** | ✅ Yes | ✅ Yes |
 | **Effects & Computed** | ✅ Yes | ✅ Yes |
 | **Global Shortcuts** | ❌ No | ✅ Yes (`ClassName`, `tagName`, `Name`, etc.) |
-| **Reactive Bindings** | ❌ No | ✅ Yes (`bind`, `updateAll`) |
-| **Conditional Rendering** | ❌ No | ✅ Yes (integrated `condition`) |
+| **Reactive Bindings** | ❌ No | ✅ Yes (`bindings`, `updateAll`) |
+| **Conditional Rendering** | ❌ No | ✅ Yes (`whenState`, pattern matching) |
 | **DOM Updates** | 🔧 Manual | ⚡ Automatic |
 | **Batch Operations** | 🔧 Manual loops | ⚡ Built-in `updateAll` |
 | **API Style** | Plain JavaScript | Integrated, fluent API |
@@ -307,8 +342,8 @@ DOMHelpers Core-Reactive is built on these principles:
 ### **1. Beginner-Friendly First**
 ```javascript
 // Clear, readable, approachable
-ClassName('button').bind({
-  textContent: () => state.value
+bindings({
+  '#button': () => state.value
 });
 ```
 
@@ -317,8 +352,10 @@ Everything works together naturally—no awkward integrations or separate system
 
 ### **3. Scale Automatically**
 ```javascript
-// One binding works for ALL elements
-ClassName('counter').bind({ textContent: () => count });
+// ClassName array-based updates - NO forEach needed
+ClassName('counter').update({
+  textContent: counts.map(c => c.value)
+});
 
 // Add more .counter elements - they work automatically
 // No code changes needed
@@ -328,10 +365,13 @@ ClassName('counter').bind({ textContent: () => count });
 Write **what** you want, not **how** to do it.
 
 ```javascript
-// What: Show this when logged in
-ClassName('user-menu').condition(() => isLoggedIn);
+// What: Apply class based on state
+whenState(isLoggedIn, {
+  true: 'user-logged-in',
+  false: 'user-guest'
+}, '#userMenu');
 
-// Not How: If logged in, find elements, loop, set display...
+// Not How: If logged in, find elements, loop, set class...
 ```
 
 ---
@@ -343,42 +383,59 @@ Not an afterthought—they're the foundation:
 
 ```javascript
 // These are powerful, semantic, and designed for scale
-ClassName('items')       // All elements with class
+Elements.myButton        // By ID (fastest, cached)
+ClassName('items')       // All elements with class (auto-iterates)
 tagName('button')        // All buttons
 Name('email')            // All elements with name="email"
 querySelector('#app')    // Single element
 querySelectorAll('.list') // Multiple elements
 
-// All support reactive operations
-ClassName('items').updateAll(el => { /* batch update */ });
-tagName('output').bind({ textContent: () => data });
-Name('email').condition(() => showEmailField);
+// ClassName array-based updates - NO forEach needed!
+ClassName('items').update({
+  textContent: items.map(i => i.name),
+  dataset: { id: items.map(i => i.id) }
+});
+
+// Index access
+ClassName('items')[0]    // First element
+ClassName('items')[-1]   // Last element
 ```
 
 ### **Reactive Bindings Are First-Class**
 Not a plugin—built into the core:
 
 ```javascript
-// Bind any property
-bind({ textContent: () => value })
-bind({ innerHTML: () => html })
-bind({ value: () => formValue })
-bind({ disabled: () => !canSubmit })
-bind({ 'class.active': () => isActive })
-bind({ 'style.color': () => themeColor })
+// bindings() - Declarative DOM synchronization
+bindings({
+  '#output': () => value,
+  '#display': () => html,
+  '#input': () => formValue,
+
+  // Multiple properties
+  '#submitBtn': {
+    disabled: () => !canSubmit,
+    className: () => canSubmit ? 'btn active' : 'btn'
+  }
+});
 ```
 
 ### **Conditions Are Integrated**
 Not a separate system—part of the reactive flow:
 
 ```javascript
-// Show/hide reactively
-condition(() => shouldShow)
+// whenState - Pattern matching
+whenState(status, {
+  'loading': 'spinner-active',
+  'success': 'status-success',
+  'error': 'status-error'
+}, '#statusIndicator');
 
-// Works with all shortcuts
-ClassName('modal').condition(() => isOpen);
-tagName('section').condition(() => hasContent);
-querySelector('#banner').condition(() => showBanner);
+// Numeric ranges
+whenState(count, {
+  '0': 'empty',
+  '1-10': 'few',
+  '>10': 'many'
+}, '#counter');
 ```
 
 ---
@@ -395,11 +452,12 @@ DOMHelpers Core-Reactive is ready to use:
 // Start building immediately
 const state = ReactiveUtils.state({ count: 0 });
 
-ClassName('counter').bind({
-  textContent: () => state.count
+// bindings() - Declarative synchronization
+bindings({
+  '#counter': () => state.count
 });
 
-querySelector('#increment').addEventListener('click', () => {
+Elements.increment.addEventListener('click', () => {
   state.count++;
 });
 </script>
@@ -412,17 +470,18 @@ querySelector('#increment').addEventListener('click', () => {
 ## **Summary**
 
 **DOMHelpers Core-Reactive** is an integrated reactive framework that combines:
-- **Reactivity** (state, effects, computed)
-- **Core shortcuts** (ClassName, tagName, Name, querySelector, querySelectorAll)
-- **Enhancers** (bind, updateAll, reactive DOM operations)
-- **Conditions** (reactive show/hide)
+- **Reactivity** (state, effects, computed, collections)
+- **Core shortcuts** (Elements, ClassName, tagName, Name, querySelector, querySelectorAll)
+- **Enhancers** (bindings, updateAll, array-based updates)
+- **Conditions** (whenState with pattern matching)
 
 Unlike the **standalone Reactive** version that provides only reactivity with plain JavaScript, **Core-Reactive** gives you a complete, integrated system where reactivity, DOM manipulation, and conditional rendering work together seamlessly.
 
 **Choose Core-Reactive** when you want:
 - Clean, beginner-friendly code
-- Declarative reactive bindings
-- Global shortcuts that scale
+- Declarative reactive bindings with `bindings()`
+- Global shortcuts that scale (Elements, ClassName auto-iteration)
+- Pattern-based conditions with `whenState`
 - Everything integrated and working together
 - Less code, more functionality
 
@@ -432,4 +491,4 @@ Unlike the **standalone Reactive** version that provides only reactivity with pl
 - Minimal dependencies
 - Plain JavaScript approach
 
-Both share the same reactive core, but Core-Reactive takes it further with integrated DOM helpers and reactive bindings that make building reactive UIs effortless.
+Both share the same reactive core, but Core-Reactive takes it further with integrated DOM helpers (Elements, ClassName with array-based updates), declarative bindings (`bindings()`), and pattern-matched conditions (`whenState`) that make building reactive UIs effortless.

@@ -933,184 +933,298 @@ The `autoSave()` function accepts an options object with 11 configuration option
 
 ---
 
-## **Advanced: autoSave with Global Shortcuts**
+## **Advanced: autoSave with Full Library Features**
 
-Combining `autoSave()` with global DOM shortcuts creates powerful reactive applications.
+Combining `autoSave()` with **Elements** (ID access), **bindings()** (declarative sync), **ClassName auto-iteration**, and **conditions** creates a complete auto-persisting reactive system.
 
-### **Example: Theme System with ClassName**
+### **Example: Elements + bindings() - Auto-Persisting UI**
 ```javascript
 const appState = ReactiveUtils.state({
-  theme: 'light',
-  accentColor: 'blue',
-  fontSize: 14
+  username: 'alice',
+  theme: 'dark',
+  credits: 100,
+  status: 'premium'
 });
 
-// Auto-save with persistence
+// Auto-save to localStorage
 ReactiveUtils.autoSave(appState, 'appState', {
   storage: 'localStorage',
-  namespace: 'myApp'
+  namespace: 'myApp',
+  debounce: 300
 });
 
-// Reactive UI - automatically syncs on ANY state change
-ReactiveUtils.effect(() => {
-  // Update ALL themed elements at once
-  ClassName('themed').updateAll(el => {
-    el.dataset.theme = appState.theme;
-    el.dataset.accent = appState.accentColor;
-    el.style.fontSize = appState.fontSize + 'px';
-  });
+// Declarative bindings - Elements (ID-based, fastest)
+bindings({
+  '#username': () => appState.username,
+  '#credits': () => appState.credits + ' credits',
+  '#theme': () => appState.theme,
+
+  // Multiple properties
+  '#statusBadge': {
+    textContent: () => appState.status.toUpperCase(),
+    className: () => `badge ${appState.status}`
+  }
 });
 
-// Change state - saves AND updates UI
-appState.theme = 'dark';  // Saves to localStorage + UI updates
-appState.fontSize = 16;   // Saves to localStorage + UI updates
+// Change state - auto-saves + UI updates automatically
+appState.credits = 150;  // Saves to localStorage + #credits updates
+appState.theme = 'light'; // Saves + #theme updates
 ```
 
 **Benefits:**
-- State changes auto-save to storage
-- UI auto-updates via effect
-- `ClassName()` updates all matching elements
-- Zero manual DOM manipulation
+- **Elements** via `#id` = Fast, direct ID access
+- **bindings()** = Declarative DOM sync
+- **autoSave()** = Automatic persistence
+- State changes = Save + UI update simultaneously
 
-### **Example: Form Auto-Save with Name**
+### **Example: ClassName Array-Based + Computed - Auto-Persisting Lists**
 ```javascript
-const formState = ReactiveUtils.state({
-  title: '',
-  content: '',
-  tags: [],
-  published: false
+const appState = ReactiveUtils.state({
+  items: [
+    { name: 'Item A', price: 29.99, stock: 10 },
+    { name: 'Item B', price: 39.99, stock: 5 },
+    { name: 'Item C', price: 49.99, stock: 0 }
+  ]
 });
 
-// Auto-save form drafts
-ReactiveUtils.autoSave(formState, 'postDraft', {
-  storage: 'sessionStorage',
-  debounce: 500,  // Save 500ms after last change
-  onSave: (value) => {
-    console.log('Draft saved:', new Date().toLocaleTimeString());
-    return value;
-  }
+// Computed property
+appState.$computed('totalValue', function() {
+  return this.items.reduce((sum, item) => sum + (item.price * item.stock), 0);
 });
 
-// Bind form fields to state
-querySelectorAll('[name]').forEach(field => {
-  field.addEventListener('input', () => {
-    const name = field.name;
-    const value = field.type === 'checkbox' ? field.checked : field.value;
-    formState[name] = value;
-    // Automatically saves after 500ms (debounced)
-  });
+// Auto-save to localStorage
+ReactiveUtils.autoSave(appState, 'inventory', {
+  storage: 'localStorage',
+  namespace: 'shop',
+  debounce: 500
 });
 
-// Restore from storage on load
 ReactiveUtils.effect(() => {
-  Object.entries(formState).forEach(([name, value]) => {
-    Name(name).updateAll(field => {
-      if (field.type === 'checkbox') {
-        field.checked = value;
-      } else {
-        field.value = value;
-      }
-    });
+  // Array-based update - NO forEach needed!
+  ClassName('item-name').update({
+    textContent: appState.items.map(item => item.name)
+  });
+
+  ClassName('item-price').update({
+    textContent: appState.items.map(item => `$${item.price}`)
+  });
+
+  ClassName('item-stock').update({
+    textContent: appState.items.map(item => item.stock || 'Out of stock'),
+    className: appState.items.map(item => item.stock > 0 ? 'in-stock' : 'out-of-stock')
   });
 });
+
+// Bindings for computed total
+bindings({
+  '#totalValue': () => `$${appState.totalValue.toFixed(2)}`
+});
+
+// Index access
+ClassName('item-row')[0]    // First item
+ClassName('item-row')[-1]   // Last item
+
+// Update item - auto-saves + UI updates
+appState.items[0].stock = 15;
+// Saves to localStorage + all item displays update
 ```
 
-**Why this scales:**
-- Works with ANY form size
-- `Name()` handles multiple fields (radios, checkboxes)
-- Debounced saves prevent excessive writes
-- Auto-restores on page load
+**Why this is elegant:**
+- **No forEach** - ClassName auto-iterates
+- **Array-based updates** - Direct mapping
+- **Computed properties** - Derived values with `$computed()`
+- **Auto-save** - Persists on every change
+- Changes = Save + render simultaneously
 
-### **Example: Dashboard with tagName**
+### **Example: Conditions + whenState - Auto-Persisting State Machines**
 ```javascript
-const dashboard = ReactiveUtils.state({
-  metrics: {
-    users: 0,
-    posts: 0,
-    revenue: 0
-  },
-  lastUpdate: null
+const appState = ReactiveUtils.state({
+  connectionStatus: 'connected',
+  userLevel: 5,
+  notificationCount: 0,
+  syncStatus: 'idle'
 });
 
-// Persist dashboard state
-ReactiveUtils.autoSave(dashboard, 'dashboardState', {
+// Auto-save state
+ReactiveUtils.autoSave(appState, 'appState', {
   storage: 'localStorage',
-  namespace: 'analytics',
-  onSave: (value) => {
-    value.lastUpdate = Date.now();
-    return value;
-  }
+  namespace: 'app',
+  debounce: 200
 });
 
-// Update all metric outputs
+// Reactive conditions - pattern matching
 ReactiveUtils.effect(() => {
-  tagName('output').updateAll(el => {
-    const metric = el.dataset.metric;
-    if (metric && dashboard.metrics[metric] !== undefined) {
-      el.textContent = dashboard.metrics[metric].toLocaleString();
+  // String pattern matching
+  whenState(appState.connectionStatus, {
+    'connected': 'status-online',
+    'connecting': 'status-connecting',
+    'disconnected': 'status-offline',
+    'error': 'status-error'
+  }, '#connectionIndicator');
+
+  // Numeric range matching
+  whenState(appState.userLevel, {
+    '0-3': 'level-beginner',
+    '4-7': 'level-intermediate',
+    '8-10': 'level-expert'
+  }, '#userBadge');
+
+  // Visibility conditions
+  whenState(appState.notificationCount, {
+    '0': 'hidden',
+    '>0': 'visible'
+  }, '#notificationBadge');
+
+  // Sync status
+  whenState(appState.syncStatus, {
+    'idle': 'sync-idle',
+    'syncing': 'sync-active spinner',
+    'complete': 'sync-success',
+    'failed': 'sync-error'
+  }, '#syncIndicator');
+});
+
+// Bindings for dynamic content
+bindings({
+  '#notificationCount': () => appState.notificationCount || '',
+  '#levelDisplay': () => `Level ${appState.userLevel}`
+});
+
+// Update state - auto-saves + conditions apply automatically
+appState.connectionStatus = 'disconnected';  // Saves + #connectionIndicator gets .status-offline
+appState.userLevel = 8;                      // Saves + #userBadge gets .level-expert
+appState.notificationCount = 5;              // Saves + #notificationBadge gets .visible
+```
+
+**Why conditions are powerful:**
+- **Pattern matching** - No manual if/else
+- **Declarative** - Define what, not how
+- **Auto-save** - State persists automatically
+- **Reactive** - Updates happen automatically
+- Perfect for state machines!
+
+### **Example: Complete System - Collections + watch + updateAll**
+```javascript
+// Reactive state
+const appState = ReactiveUtils.state({
+  theme: 'light',
+  filter: 'all',
+  sortBy: 'date'
+});
+
+// Reactive collection
+const todos = ReactiveUtils.collection([
+  { id: 1, text: 'Learn DOMHelpers', done: false, created: Date.now() },
+  { id: 2, text: 'Build app', done: false, created: Date.now() + 1000 }
+]);
+
+// Auto-save app state
+ReactiveUtils.autoSave(appState, 'appState', {
+  storage: 'localStorage',
+  namespace: 'todoApp',
+  debounce: 300
+});
+
+// Watch collection - save todos separately
+ReactiveUtils.watch(todos, () => {
+  localStorage.setItem('todoApp:todos', JSON.stringify(todos.items));
+});
+
+// Computed properties
+appState.$computed('activeCount', function() {
+  return todos.filter(t => !t.done).length;
+});
+
+appState.$computed('completedCount', function() {
+  return todos.filter(t => t.done).length;
+});
+
+// Declarative bindings - Elements
+bindings({
+  '#todoCount': () => todos.length,
+  '#activeCount': () => appState.activeCount,
+  '#completedCount': () => appState.completedCount,
+  '#filter': () => appState.filter,
+  '#theme': () => appState.theme
+});
+
+// Conditions - theme and state
+ReactiveUtils.effect(() => {
+  whenState(appState.theme, {
+    'light': 'theme-light',
+    'dark': 'theme-dark',
+    'auto': 'theme-auto'
+  }, 'body');
+
+  whenState(todos.length, {
+    '0': 'empty-state',
+    '1-5': 'few-todos',
+    '>5': 'many-todos'
+  }, '#todoContainer');
+});
+
+// Render with array-based updates
+ReactiveUtils.effect(() => {
+  const filtered = todos.filter(t => {
+    if (appState.filter === 'active') return !t.done;
+    if (appState.filter === 'completed') return t.done;
+    return true;
+  });
+
+  const sorted = filtered.sort((a, b) => {
+    if (appState.sortBy === 'date') return b.created - a.created;
+    return a.text.localeCompare(b.text);
+  });
+
+  // Array-based - NO forEach!
+  ClassName('todo-item').update({
+    textContent: sorted.map(t => t.text),
+    dataset: { id: sorted.map(t => t.id) },
+    className: sorted.map(t => t.done ? 'todo-item done' : 'todo-item')
+  });
+});
+
+// Mixed updates with updateAll()
+function updateDashboard(theme, todoCount) {
+  updateAll({
+    // Update state (triggers auto-save)
+    theme: theme,
+
+    // Update DOM directly
+    '#dashboard': {
+      className: `dashboard ${theme}-mode`,
+      dataset: { count: todoCount }
     }
   });
-});
+}
 
-// Update metrics - saves automatically + UI updates
-dashboard.metrics.users = 1234;
-dashboard.metrics.posts = 5678;
-// All <output> elements update + state saves to localStorage
+// Add todo - collection watch auto-saves
+function addTodo(text) {
+  todos.add({
+    id: Date.now(),
+    text,
+    done: false,
+    created: Date.now()
+  });
+  // Auto-saved via watch()
+}
+
+// Toggle filter - auto-saves
+function setFilter(filter) {
+  appState.filter = filter;
+  // Auto-saved via autoSave()
+}
 ```
 
-### **Example: Settings Panel with querySelectorAll**
-```javascript
-const settings = ReactiveUtils.state({
-  notifications: true,
-  autoSave: true,
-  darkMode: false,
-  language: 'en'
-});
-
-// Persist settings
-ReactiveUtils.autoSave(settings, 'userSettings', {
-  storage: 'localStorage',
-  immediate: true  // Apply saved settings on load
-});
-
-// Sync all setting controls
-ReactiveUtils.effect(() => {
-  querySelectorAll('[data-setting]').forEach(control => {
-    const setting = control.dataset.setting;
-    const value = settings[setting];
-
-    if (control.type === 'checkbox') {
-      control.checked = value;
-    } else if (control.tagName === 'SELECT') {
-      control.value = value;
-    } else {
-      control.value = value;
-    }
-  });
-
-  // Apply settings to UI
-  ClassName('app-container').updateAll(el => {
-    el.classList.toggle('dark-mode', settings.darkMode);
-  });
-});
-
-// Update on user interaction
-querySelectorAll('[data-setting]').forEach(control => {
-  control.addEventListener('change', () => {
-    const setting = control.dataset.setting;
-    const value = control.type === 'checkbox' ? control.checked : control.value;
-    settings[setting] = value;
-    // Auto-saves + triggers effect + UI updates
-  });
-});
-```
-
-**The complete flow:**
-1. User changes setting control
-2. State updates
-3. `autoSave()` persists to localStorage
-4. Effect runs
-5. `querySelectorAll()` updates all controls
-6. `ClassName()` applies theme changes
-7. Everything stays synchronized
+**The complete auto-persisting system:**
+- **State** - Reactive objects with `$computed()` and `autoSave()`
+- **Collections** - Reactive arrays with `.add()`, `.remove()`, `.filter()`
+- **watch** - React to collection changes (auto-save)
+- **autoSave()** - Automatic persistence for state
+- **bindings()** - Declarative DOM synchronization
+- **whenState** - Conditional rendering
+- **Elements** - Fast ID-based access
+- **ClassName** - Array-based updates (no forEach)
+- **updateAll()** - Mixed state + DOM updates
+- Everything auto-saves and auto-updates!
 
