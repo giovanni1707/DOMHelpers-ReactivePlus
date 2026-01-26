@@ -427,7 +427,7 @@ export default defineConfig({
             },
             {
               text: "What Is Reactivity",
-              link: "/getting-started/what-is-core-reactive",
+              link: "/getting-started/what-is-reactivity",
             },
             {
               text: "Learning Philosophy",
