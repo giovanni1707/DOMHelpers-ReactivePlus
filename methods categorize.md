@@ -103,6 +103,8 @@
 ### **Iteration Methods**
 - `forEach(fn)` - Iterate over items 
 - `map(fn)` - Map over items and return new array 
+- `eachEntries`
+- `mapEntries`
 
 ### **Query Methods**
 - `length` - Get collection length (getter)   - **PROPERTIES**
