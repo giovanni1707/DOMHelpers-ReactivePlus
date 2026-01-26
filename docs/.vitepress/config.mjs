@@ -422,12 +422,12 @@ export default defineConfig({
           collapsed: true,
           items: [
             {
-              text: "What Is DOM Helpers Reactive",
+              text: "What Is DOM Helpers Core_Reactive",
               link: "/getting-started/what-is-dom-helpers-reactive",
             },
             {
               text: "What Is Reactivity",
-              link: "/getting-started/what-is-reactivity",
+              link: "/getting-started/what-is-core-reactive",
             },
             {
               text: "Learning Philosophy",
