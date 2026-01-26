@@ -366,13 +366,13 @@ const storageSidebar = [
 export default defineConfig({
   title: "DOM Helpers ",
   description: "A JavaScript-first DOM utility library",
-  base: "/DOMHelpers-Reactive-Documentation/",
+  base: "/DOMHelpers-Core-Reactive-240126/",
   ignoreDeadLinks: true,
 
   themeConfig: {
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/giovanni1707/DOMHelpers-Reactive-System' }
+      { icon: 'github', link: 'https://github.com/giovanni1707/DOMHelpers-core-Reactive-240126' }
     ],
 
     nav: [
