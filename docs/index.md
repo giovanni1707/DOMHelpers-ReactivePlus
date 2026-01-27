@@ -2,7 +2,7 @@
 layout: home
 
 hero:
-  name: DOM Helpers Core_Reactive
+  name: DOM Helpers ReactivePlus
   text: Fine-grained reactivity, powered by JavaScript
   tagline: No frameworks. No build tools. Just JavaScript with superpowers.
   image:

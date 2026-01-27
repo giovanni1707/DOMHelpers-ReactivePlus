@@ -104,7 +104,7 @@ code {
 
 
 .VPNavBarTitle .title::after {
-  content: 'Core_Reactive';
+  content: 'ReactivePlus';
   color: #41b883;
   -webkit-text-fill-color: #41b883f3;
   margin-left: 0.25em;  /* Add space with margin */

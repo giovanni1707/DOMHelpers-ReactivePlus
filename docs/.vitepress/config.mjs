@@ -372,13 +372,13 @@ export default defineConfig({
   themeConfig: {
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/giovanni1707/DOMHelpers-core-Reactive-240126' }
+      { icon: 'github', link: 'https://github.com/giovanni1707/DOMHelpers ReactivePlus' }
     ],
 
     nav: [
       {
         text: "Getting Started",
-        link: "/getting-started/what-is-core-reactive",
+        link: "/getting-started/what-is-ReactivePlus",
       },
       { text: "Fundamentals", link: "/reactive-state/state" },
       // UPDATED: Created a dropdown for Collection, Form, Async, and Storage
