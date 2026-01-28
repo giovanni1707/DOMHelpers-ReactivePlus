@@ -372,7 +372,7 @@ export default defineConfig({
   themeConfig: {
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/giovanni1707/DOMHelpers ReactivePlus' }
+      { icon: 'github', link: 'https://github.com/giovanni1707/DOMHelpers-ReactivePlus' }
     ],
 
     nav: [
