@@ -325,12 +325,12 @@ const storageSidebar = [
     text: "Reactive Storage Proxy Methods",
     collapsed: true,
     items: [
-      { text: "set", link: "/reactive-storage-proxy-methods/proxy.set" },
-      { text: "get", link: "/reactive-storage-proxy-methods/proxy.get" },
-      { text: "remove", link: "/reactive-storage-proxy-methods/proxy.remove" },
-      { text: "has", link: "/reactive-storage-proxy-methods/proxy.has" },
-      { text: "keys", link: "/reactive-storage-proxy-methods/proxy.keys" },
-      { text: "clear", link: "/reactive-storage-proxy-methods/proxy.clear" },
+      { text: "set", link: "/reactive-storage-proxy-methods/proxy-set" },
+      { text: "get", link: "/reactive-storage-proxy-methods/proxy-get" },
+      { text: "remove", link: "/reactive-storage-proxy-methods/proxy-remove" },
+      { text: "has", link: "/reactive-storage-proxy-methods/proxy-has" },
+      { text: "keys", link: "/reactive-storage-proxy-methods/proxy-keys" },
+      { text: "clear", link: "/reactive-storage-proxy-methods/proxy-clear" },
     ],
   },
 
@@ -338,6 +338,7 @@ const storageSidebar = [
     text: "AutoSave Options",
     collapsed: true,
     items: [
+      { text: "storage", link: "/autosave-options/autoSave-options" },
       { text: "storage", link: "/autosave-options/options.storage" },
       { text: "namespace", link: "/autosave-options/options.namespace" },
       { text: "debounce", link: "/autosave-options/options.debounce" },
@@ -356,6 +357,7 @@ const storageSidebar = [
     text: "WatchStorage Options",
     collapsed: true,
     items: [
+      { text: "storage", link: "/watchstorage-options/watchStorage-options" },
       { text: "storage", link: "/watchstorage-options/options.storage" },
       { text: "namespace", link: "/watchstorage-options/options.namespace" },
       { text: "immediate", link: "/watchstorage-options/options.immediate" },
@@ -387,7 +389,7 @@ export default defineConfig({
         items: [
           { text: "Collection", link: "/collection-operations/items" },
           { text: "Form", link: "/form-operations/setValue" },
-          { text: "Async", link: "/async-operations/asyncState" },
+          { text: "Async", link: "/async-operations/execute" },
           { text: "Storage", link: "/storage-integration/autoSave" },
         ],
       },
