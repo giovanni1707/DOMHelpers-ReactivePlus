@@ -1,3 +1,7 @@
+[![Sponsor](https://img.shields.io/badge/Sponsor-💖-pink)](https://github.com/sponsors/giovanni1707)
+
+[![Sponsor](https://img.shields.io/badge/Sponsor-PayPal-blue?logo=paypal)](https://paypal.me/GiovanniSylvain)
+
 # Contact & Support
 <div class="creator">
   <img src="/me.jpg" alt="Giovanni Marianne" class="creator-photo" />
@@ -49,5 +53,3 @@ Interested in contributing? Check out the [Contributing Guidelines](link-to-cont
 
 **Thank you for using DOM Helpers!**  
 Your feedback and support help make this library better for everyone. 🚀
-
-

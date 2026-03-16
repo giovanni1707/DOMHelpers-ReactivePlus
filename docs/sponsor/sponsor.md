@@ -1,3 +1,7 @@
+[![Sponsor](https://img.shields.io/badge/Sponsor-💖-pink)](https://github.com/sponsors/giovanni1707)
+
+[![Sponsor](https://img.shields.io/badge/Sponsor-PayPal-blue?logo=paypal)](https://paypal.me/GiovanniSylvain)
+
 # Sponsor DOM Helpers
 <div class="creator">
   <img src="/me.jpg" alt="Giovanni Marianne" class="creator-photo" />
@@ -144,4 +148,3 @@ Creator & Maintainer of DOM Helpers
 
 *DOM Helpers is MIT licensed and will always remain free and open source.*  
 *Sponsorship helps ensure it stays that way.*
-

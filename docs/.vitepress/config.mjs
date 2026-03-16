@@ -276,27 +276,44 @@ const otherSidebar = [
     collapsed: true,
     items: [
       {
-        text: "DevTools overview",
-        link: "/development-tool/DevTools-overview",
+        text: "DevTools",
+        link: "/development-tool/DevTools",
       },
       {
-        text: "DevTools lifecycle",
-        link: "/development-tool/DevTools-lifecycle",
+        text: "DevTools-enable",
+        link: "/development-tool/DevTools-enable",
       },
       {
-        text: "DevTools tracking",
-        link: "/development-tool/DevTools-tracking",
+        text: "DevTools-disable",
+        link: "/development-tool/DevTools-disable",
       },
       {
-        text: "DevTools inspection",
-        link: "/development-tool/DevTools-inspection",
+        text: "DevTools-trackState",
+        link: "/development-tool/DevTools-trackState",
       },
       {
-        text: "DevTools guides",
-        link: "/development-tool/DevTools-guides",
+        text: "DevTools-trackEffect",
+        link: "/development-tool/DevTools-trackEffect",
+      },
+      {
+        text: "DevTools-getStates",
+        link: "/development-tool/DevTools-getStates",
+      },
+      {
+        text: "DevTools-properties",
+        link: "/development-tool/DevTools-properties",
+      },
+      {
+        text: "DevTools-getHistory",
+        link: "/development-tool/DevTools-getHistory",
+      },
+       {
+        text: "DevTools-clearHistory",
+        link: "/development-tool/DevTools-clearHistory",
       },
     ],
   },
+  
 ];
 
 const storageSidebar = [
@@ -400,7 +417,7 @@ export default defineConfig({
           { text: "Cleanup System", link: "/cleanup-system/collector" },
           { text: "Error Handling", link: "/error-handling/ErrorBoundary" },
           { text: "Reactivity Engine", link: "/reactivity-engine/under-the-hood" },
-          { text: "Development Tools", link: "/development-tool/DevTools-overview" },
+          { text: "Development Tools", link: "/development-tool/DevTools" },
         ],
       },
       // UPDATED: Created a dropdown for About section

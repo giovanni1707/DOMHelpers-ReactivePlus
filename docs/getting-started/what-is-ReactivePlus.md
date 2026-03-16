@@ -1,3 +1,7 @@
+[![Sponsor](https://img.shields.io/badge/Sponsor-💖-pink)](https://github.com/sponsors/giovanni1707)
+
+[![Sponsor](https://img.shields.io/badge/Sponsor-PayPal-blue?logo=paypal)](https://paypal.me/GiovanniSylvain)
+
 # What is DOMHelpers Core-Reactive?
 
 **DOMHelpers Core-Reactive** is an **integrated, batteries-included reactive framework** that combines powerful DOM manipulation with fine-grained reactivity in a clean, beginner-friendly package.

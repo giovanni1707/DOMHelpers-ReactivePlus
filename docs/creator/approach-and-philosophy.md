@@ -1,3 +1,7 @@
+[![Sponsor](https://img.shields.io/badge/Sponsor-💖-pink)](https://github.com/sponsors/giovanni1707)
+
+[![Sponsor](https://img.shields.io/badge/Sponsor-PayPal-blue?logo=paypal)](https://paypal.me/GiovanniSylvain)
+
 # DOM Helpers – Approach & Philosophy
 <div class="creator">
   <img src="/me.jpg" alt="Giovanni Marianne" class="creator-photo" />
@@ -179,4 +183,3 @@ DOM Helpers is:
 **If you love JavaScript**, DOM Helpers is built for you.
 
 **If you're learning JavaScript**, DOM Helpers helps you learn it better.
-

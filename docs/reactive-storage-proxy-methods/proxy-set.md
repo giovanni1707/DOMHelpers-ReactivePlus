@@ -1,3 +1,7 @@
+[![Sponsor](https://img.shields.io/badge/Sponsor-💖-pink)](https://github.com/sponsors/giovanni1707)
+
+[![Sponsor](https://img.shields.io/badge/Sponsor-PayPal-blue?logo=paypal)](https://paypal.me/GiovanniSylvain)
+
 # `proxy.set(key, value, options)` - Set Value in Reactive Storage
 
 **Quick Start (30 seconds)**
@@ -740,4 +744,3 @@ dashboard.set('widgets', currentWidgets);
 - Using `ClassName()` for scoped selection
 - Nested `querySelector()` for widget internals
 - Declarative and maintainable
-

@@ -1,3 +1,7 @@
+[![Sponsor](https://img.shields.io/badge/Sponsor-💖-pink)](https://github.com/sponsors/giovanni1707)
+
+[![Sponsor](https://img.shields.io/badge/Sponsor-PayPal-blue?logo=paypal)](https://paypal.me/GiovanniSylvain)
+
 # `proxy.get(key)` - Get Value from Reactive Storage
 
 **Quick Start (30 seconds)**
@@ -668,4 +672,3 @@ notifications.set('unread', unread);
 - `ClassName()` updates all badges in all tabs
 - Single source of truth (storage)
 - No manual polling or postMessage needed
-

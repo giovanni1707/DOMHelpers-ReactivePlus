@@ -1,3 +1,7 @@
+[![Sponsor](https://img.shields.io/badge/Sponsor-💖-pink)](https://github.com/sponsors/giovanni1707)
+
+[![Sponsor](https://img.shields.io/badge/Sponsor-PayPal-blue?logo=paypal)](https://paypal.me/GiovanniSylvain)
+
 # `autoSave()` Options - Configuration Reference
 
 **Quick Start (30 seconds)**
@@ -1113,4 +1117,3 @@ querySelectorAll('[data-setting]').forEach(control => {
 5. `querySelectorAll()` updates all controls
 6. `ClassName()` applies theme changes
 7. Everything stays synchronized
-
