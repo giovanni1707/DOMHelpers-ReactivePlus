@@ -429,9 +429,9 @@ export default defineConfig({
         ],
       },
 
-      { text: "Reactive", link: "https://giovanni1707.github.io/DOMHelpers-Reactive" },
+      { text: "DOMHelpers Reactive", link: "https://giovanni1707.github.io/DOMHelpers-Reactive" },
 
-      { text: "Core", link: "https://giovanni1707.github.io/DOMHelpers-Core/" },
+      { text: "DOMHelpers Core", link: "https://giovanni1707.github.io/DOMHelpers-Core/" },
     ],
 
     sidebar: {
